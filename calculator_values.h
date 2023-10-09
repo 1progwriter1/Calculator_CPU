@@ -10,13 +10,17 @@
 
 #include "Stack/stack_values.h"
 
-const int LEN_COMMAND = 4;
-const int NUM_OF_REG = 4;
+const int LEN_COMMAND_PUSH = 4;
+const int LEN_COMMAND_POP_R = 5;
+const int NUM_OF_REGS = 4;
+const int REG_LEN = 3;
+const int MAX_STRLEN = 10;
+const char MY_SIGN[] = "VLI";
 
-const int NUM_OF_COMMANDS = 11;
-const int Push_r = 11;
-const int Pop_r = 12;
-const char commands[11][5] = {"sub", "div", "out", "hlt", "add", "mul", "sqrt", "sin", "cos", "in", "push"};
+const char regs[NUM_OF_REGS][4] = {"rax", "rbx", "rcx", "rdx"};
+
+const int NUM_OF_COMMANDS = 12;
+const char commands[NUM_OF_COMMANDS + 1][6] = {"sub", "div", "out", "hlt", "add", "mul", "sqrt", "sin", "cos", "in", "push", "pop", "push"};
 
 enum Commands {
     SUB,
@@ -30,8 +34,8 @@ enum Commands {
     COS,
     IN,
     PUSH,
+    POP,
     PUSH_R,
-    POP_R
 };
 
 struct Calc {

@@ -14,14 +14,14 @@ int main() {
     fileclose(translator(fn));
     fileclose(fn);
     FILE *expl = fileopen(byte_code, READ);
-    Stack example = {};
-    STACK_CTOR(example);
+    Calc example = {};
+    CalcCtor(&example);
 
-    //Calculate(&example, expl);
+    Calculate(&example, expl);
 
     fileclose(expl);
 
-    /* FILE *fn2 = fileopen(byte_code, READ);
-    disassembler(fn2); */
-    //fileclose(fn2);
+    FILE *fn2 = fileopen(byte_code, READ);
+    fileclose(disassembler(fn2));
+    fileclose(fn2);
 }

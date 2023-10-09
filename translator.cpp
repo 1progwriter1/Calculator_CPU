@@ -5,36 +5,38 @@
 #include "func.h"
 #include <string.h>
 #include "Stack/stack.h"
-
-const int MAX_STRLEN = 3;
+#include "ctype.h"
 
 FILE *translator(FILE *fn) {
 
     assert(fn);
 
-    int version = 1;
-
-    long long int len_of_file = filelen(input_file);
-    char *expr = readfile(fn, len_of_file);
-    char *curr_word_ptr = expr;
+    const int VERSION = 2;
 
     FILE *byte_code_file = fileopen(byte_code, WRITE);
-
-    for (size_t i = 0; i < len_of_file; i++) {
-        if (expr[i] == '\n') {
-            expr[i] = '\0';
-
-            int com_num = CommandNumber(curr_word_ptr);
-            if (com_num == 10)
-                fprintf(byte_code_file, "%d %s\n", CommandNumber(curr_word_ptr), curr_word_ptr + LEN_COMMAND + 1);
-            else
-                fprintf(byte_code_file, "%d\n", CommandNumber(curr_word_ptr));
-
-            if (i < len_of_file - 1)
-                curr_word_ptr = expr + i + 1;
+    fprintf(byte_code_file, "VLI\n");
+    fprintf(byte_code_file, "%d\n", VERSION);
+    char str[MAX_STRLEN] = "";
+    while (fscanf(fn, "%s", str) == 1) {
+        int com_num = CommandNumber(str);
+        if (com_num == 10) {
+            Elem_t num = 0;
+            if (fscanf(fn, output_id, &num) == 1) {
+                fprintf(byte_code_file, "%d %d\n", com_num, num);
+            }
+            else {
+                fscanf(fn, "%s", str);
+                fprintf(byte_code_file, "%d %d\n", PUSH_R, RegIndex(str));
+            }
+        }
+        else if (com_num == 11) {
+            fscanf(fn, "%s", str);
+            fprintf(byte_code_file, "%d %d\n", com_num, RegIndex(str));
+        }
+        else {
+            fprintf(byte_code_file, "%d\n", CommandNumber(str));
         }
     }
-    free(expr);
     return byte_code_file;
 }
 
@@ -43,11 +45,26 @@ int CommandNumber(char *line) {
     assert(line);
 
     for (size_t i = 0; i < NUM_OF_COMMANDS; i++) {
+        if (i == NUM_OF_COMMANDS - 2) {
+            if (strncmp(line, commands[i], LEN_COMMAND_PUSH) == 0)
+                return i;
+        }
         if (i == NUM_OF_COMMANDS - 1) {
-            if (strncmp(line, commands[i], LEN_COMMAND) == 0)
+            if (strncmp(line, commands[i], LEN_COMMAND_POP_R) == 0)
                 return i;
         }
         if (strcmp(line, commands[i]) == 0)
+            return i;
+    }
+    return -1;
+}
+
+int RegIndex(char *namereg) {
+
+    assert(namereg);
+
+    for (size_t i = 0; i < NUM_OF_REGS; i++) {
+        if (strcmp(namereg, regs[i]) == 0)
             return i;
     }
     return -1;

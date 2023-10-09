@@ -9,20 +9,29 @@ FILE *disassembler(FILE *fn) {
 
     assert(fn);
 
-    int version = 1;
+    const int VERSION = 2;
 
-    long long int len_of_file = filelen(byte_code);
-    /* char *bytecode = readfile(fn, len_of_file);
-    char *curr_code = bytecode; */
+    if (!FileVerify(fn, MY_SIGN, VERSION))
+        return NULL;
 
     FILE *disass_file = fileopen(disassem_file, WRITE);
 
     int com_num = 0;
     while (fscanf(fn, "%d", &com_num) != -1) {
-        if (com_num == 10) {
+        if (com_num == PUSH) {
             int num = 0;
             fscanf(fn, "%d", &num);
             fprintf(disass_file, "%s %d\n", commands[com_num], num);
+        }
+        else if (com_num == POP) {
+            int num = 0;
+            fscanf(fn, "%d", &num);
+            fprintf(disass_file, "%s %s\n", commands[com_num], regs[num]);
+        }
+        else if (com_num == PUSH_R) {
+            int num = 0;
+            fscanf(fn, "%d", &num);
+            fprintf(disass_file, "%s %s\n", commands[com_num], regs[num]);
         }
         else {
             fprintf(disass_file, "%s\n", commands[com_num]);

@@ -4,6 +4,7 @@
 #include <assert.h>
 #include "calculate.h"
 #include <math.h>
+#include "func.h"
 #include "Stack/config.h"
 #include "calculator_values.h"
 #include <string.h>
@@ -26,34 +27,15 @@ static void push_r(Calc *calcdata, int index);
 static void pop_r(Calc *calcdata, int index);
 static void clear();
 
-char my_sign[] = "VLI";
-
 enum Result Calculate(Calc *calcdata, FILE *fn) {
 
     assert(calcdata);
     assert(fn);
 
-    char *signature = NULL;
-    if (fscanf(fn, "%s", signature) != 1) {
-        printf("Unable to read file\n");
-        return ERROR;
-    }
+    const int VERSION = 2;
 
-    if (strcmp(my_sign, signature) != 0) {
-        printf("Incompatible file\n");
+    if (!FileVerify(fn, MY_SIGN, VERSION))
         return ERROR;
-    }
-
-    int version = 1;
-    int code_version = 0;
-    if (fscanf(fn, "%d", &code_version) != 1) {
-        printf("Unable to vefify vesion number\n");
-        return ERROR;
-    }
-    if (version != code_version) {
-        printf("Incorrect version\n");
-        return ERROR;
-    }
 
     int com_num = 0;
     int escape = 0;
@@ -62,7 +44,7 @@ enum Result Calculate(Calc *calcdata, FILE *fn) {
             case PUSH: {
                 int num = 0;
                 if (fscanf(fn, "%d", &num) != 1) {
-                    printf("\033[31mIncorrect argument for push\033[0m");
+                    printf("\033[31mIncorrect argument for push\n\033[0m");
                     break;
                 }
                 push(calcdata, num);
@@ -111,18 +93,18 @@ enum Result Calculate(Calc *calcdata, FILE *fn) {
 
             case PUSH_R: {
                 int index = 0;
-                if (fscanf(fn, "%d", &index) != 1) {
-                    printf("\033[31mIncorrect argument for register push\033[0m");
+                if (fscanf(fn, "%d", &index) != 1 || index == -1) {
+                    printf("\033[31mIncorrect argument for register push\n\033[0m");
                     break;
                 }
                 push_r(calcdata, index);
                 break;
             }
 
-            case POP_R: {
+            case POP: {
                 int index = 0;
-                if (fscanf(fn, "%d", &index) != 1) {
-                    printf("\033[31mIncorrect argument for register pop\033[0m");
+                if (fscanf(fn, "%d", &index) != 1 || index == -1) {
+                    printf("\033[31mIncorrect argument for register pop\n\033[0m");
                     break;
                 }
                 pop_r(calcdata, index);
@@ -144,7 +126,7 @@ enum Result CalcCtor(Calc *calcdata) {
         return NULL_POINTER;
 
     STACK_CTOR(calcdata->data);
-    calcdata->reg = (Elem_t *) calloc (NUM_OF_REG, sizeof (Elem_t));
+    calcdata->reg = (Elem_t *) calloc (NUM_OF_REGS, sizeof (Elem_t));
 
     return SUCCESS;
 }
@@ -180,7 +162,7 @@ void DumpCalc(Calc *calcdata, unsigned int error, int correct_reg) {
 
     if (!correct_reg) {
         printf("Register: {");
-        for (size_t i = 0; i < NUM_OF_REG; i++)
+        for (size_t i = 0; i < NUM_OF_REGS; i++)
             printf(output_id " ", calcdata->reg[i]);
         printf("\b}\n");
     }
