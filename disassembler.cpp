@@ -9,6 +9,8 @@ FILE *disassembler(FILE *fn) {
 
     assert(fn);
 
+    int version = 1;
+
     long long int len_of_file = filelen(byte_code);
     /* char *bytecode = readfile(fn, len_of_file);
     char *curr_code = bytecode; */

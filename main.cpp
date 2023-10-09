@@ -17,7 +17,7 @@ int main() {
     Stack example = {};
     STACK_CTOR(example);
 
-    Calculate(&example, expl);
+    //Calculate(&example, expl);
 
     fileclose(expl);
 

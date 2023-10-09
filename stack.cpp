@@ -6,13 +6,12 @@
 #include <ctype.h>
 #include <string.h>
 
-#define dump(stk, error) StackDump(error, (char *)__FILE__, __LINE__, (char *)__func__, stk);
-
 #ifdef logs_file
 FILE *output_file = fileopen(logs_file);
 #else
 FILE *output_file = stdout;
 #endif
+
 const int SIZESTK = 8;
 const int INCREASE = 2;
 const int EMPTY_POSITIONS = 3;
@@ -25,10 +24,8 @@ const canary_t CANARY_VALUE_DATA_LEFT = 0xC01055A1;
 const canary_t CANARY_VALUE_DATA_RIGHT = 0xBADFACE;
 
 static void PrintInfo(const Stack *stk, const char *file, const char *func, const int line);
-static unsigned int StackVerify(const Stack *stk);
 static const char* StackStrError (enum Result error);
 static void InfoDetor(StackInfo *info);
-static void StackDump(unsigned int error, const char *file, const int line, char *func, const Stack *stk);
 static void StackResize(Stack *stk, const int is_increase);
 static void Poison_fill(Stack *stk);
 static void SetCanary(Stack *stk);
@@ -164,13 +161,13 @@ void PrintStack(const Stack *stk) {
 
 }
 
-static unsigned int StackVerify(const Stack *stk) {
+unsigned int StackVerify(const Stack *stk) {
 
     assert(stk);
 
     unsigned int error = 0;
 
-    int numerror = 2;
+    int numerror = 1;
 
     if (stk == NULL) {
         error |= numerror;
@@ -255,7 +252,7 @@ static const char* StackStrError (enum Result error) {
     #undef ERR_
     }
 
-static void StackDump(unsigned int error, const char *file, const int line, char *func, const Stack *stk) {
+void StackDump(unsigned int error, const char *file, const int line, char *func, const Stack *stk) {
 
     if (!file)
         fprintf(output_file, "NULL");

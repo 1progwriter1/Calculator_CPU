@@ -12,6 +12,8 @@ FILE *translator(FILE *fn) {
 
     assert(fn);
 
+    int version = 1;
+
     long long int len_of_file = filelen(input_file);
     char *expr = readfile(fn, len_of_file);
     char *curr_word_ptr = expr;

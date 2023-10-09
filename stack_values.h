@@ -31,7 +31,6 @@ struct Stack {
 
 enum Result {
     SUCCESS,
-    NULL_POINTER,
     NO_MEMORY,
     INCORRECT_CAPACITY,
     INCORRECT_SIZE,
@@ -42,8 +41,9 @@ enum Result {
     CANARY_FAULT_DATA_RIGHT,
     HASH_ERROR,
     ID_ERROR,
+    NULL_POINTER,
     ERROR,
-    EMPTY
+    EMPTY,
 };
 
 #endif

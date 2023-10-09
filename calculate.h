@@ -3,7 +3,12 @@
 
 #include <stdio.h>
 #include "Stack/stack_values.h"
+#include "calculator_values.h"
 
-void Calculate(Stack *example, FILE *fn);
+enum Result Calculate(Calc *calcdata, FILE *fn);
+enum Result CalcCtor(Calc *calcdata);
+enum Result CalcDtor(Calc *calcdata);
+void CalcVerify(Calc *calcdata);
+void DumpCalc(Calc *calcdata, unsigned int error, int correct_reg);
 
 #endif
