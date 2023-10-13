@@ -5,7 +5,7 @@
 #define WRITE "w"
 
 #define input_file "expression.txt"
-#define byte_code "byte_code.txt"
+#define byte_code "byte_code.bin"
 #define disassem_file "dis_file.txt"
 
 #include "Stack/stack_values.h"
@@ -15,7 +15,7 @@ const int LEN_COMMAND_POP_R = 5;
 const int NUM_OF_REGS = 4;
 const int REG_LEN = 3;
 const int MAX_STRLEN = 10;
-const char MY_SIGN[] = "VLI";
+const int MY_SIGN = 'V' + 'L' + 'I';
 
 const char regs[NUM_OF_REGS][4] = {"rax", "rbx", "rcx", "rdx"};
 

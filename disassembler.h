@@ -2,7 +2,8 @@
 #define DISASS_CALC
 
 #include <stdio.h>
+#include "Stack/stack_values.h"
 
-FILE *disassembler(FILE *fn);
+enum Result disassembler(const char *file);
 
 #endif

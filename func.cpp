@@ -5,29 +5,15 @@
 #include <sys/stat.h>
 #include <string.h>
 
-int FileVerify(FILE *fn, const char *sign, const int version) {
+int FileVerify(const int sign, const int version_icon, const int version_given) {
 
-    assert(sign);
-
-    char signature[MAX_STRLEN] = "";
-    if (fscanf(fn, "%s", signature) != 1) {
+    if (sign != MY_SIGN) {
         printf("\033[31mUnable to read file\n\033[0m");
         return 0;
     }
 
-    if (strcmp(sign, signature) != 0) {
-        printf("%s %s\n", sign, signature);
-        printf("\033[31mIncompatible file\n\033[0m");
-        return 0;
-    }
-
-    int code_version = 0;
-    if (fscanf(fn, "%d", &code_version) != 1) {
-        printf("\033[31mUnable to verify version\n\033[0m");
-        return 0;
-    }
-    if (version != code_version) {
-        printf("\033[31mIncorrect version\n\033[0m");
+    if (version_given != version_icon) {
+        printf("\033[31mIncompatible version\n\033[0m");
         return 0;
     }
     return 1;
@@ -39,7 +25,7 @@ FILE *fileopen(const char *filename, const char mode[]) {
 
     FILE *fn = fopen(filename, mode);
 
-    if (fn == NULL)
+    if (fn == nullptr)
         perror("");
 
     return fn;

@@ -3,25 +3,28 @@
 #include "calculator_values.h"
 #include "func.h"
 #include <assert.h>
-#include "translator.h"
-#include "calculate.h"
+#include "assembler.h"
+#include "processor.h"
 #include "disassembler.h"
+#include <math.h>
 
 int main() {
 
     FILE *fn = fileopen(input_file, READ);
-
-    fileclose(translator(fn));
+    translator(fn);
     fileclose(fn);
-    FILE *expl = fileopen(byte_code, READ);
+
     Calc example = {};
     CalcCtor(&example);
 
-    Calculate(&example, expl);
+    Calculate(&example, byte_code);
 
-    fileclose(expl);
 
-    FILE *fn2 = fileopen(byte_code, READ);
-    fileclose(disassembler(fn2));
-    fileclose(fn2);
+
+    disassembler(byte_code);
+    /* const double PI = 3.14159265;
+    printf("%lg", sin ((double) 30 / (int) pow (10, 0) * PI / 180)); */
+
+    return SUCCESS;
+
 }

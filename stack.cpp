@@ -99,7 +99,7 @@ enum Result StackPop(Stack *stk, Elem_t *n) {
     }
     if (stk->size >= 1) {
         *n = stk->data[--stk->size];
-        stk->data[stk->size + 1] = POISON;
+        stk->data[stk->size] = POISON;
         if (stk->capacity > SIZESTK && stk->capacity - stk->size > stk->capacity - stk->capacity / 2) {
             StackResize(stk, CUT);
             if (!stk->data)
