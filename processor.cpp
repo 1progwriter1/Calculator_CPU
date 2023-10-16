@@ -9,7 +9,7 @@
 #include "calculator_values.h"
 #include <string.h>
 
-const int PRECISION = 0;
+const int PRECISION = 3;
 const int MUL_PRES = (int) pow(10, PRECISION);
 const double PI = 3.14159265;
 
@@ -32,7 +32,7 @@ enum Result Calculate(Calc *calcdata, const char *file) {
     assert(calcdata);
     assert(file);
 
-    const int VERSION = 3;
+    const int VERSION = 4;
 
     long long int len_of_file = filelen(file);
     FILE *fn = fileopen(file, READ);
@@ -47,83 +47,26 @@ enum Result Calculate(Calc *calcdata, const char *file) {
         return ERROR;
 
     Elem_t com_num = 0;
+
+    #define DEF_CMD(name, code, args, type, ...)\
+        case (code): {                          \
+            __VA_ARGS__                         \
+            break;                              \
+        }                                       \
+
     do {
         com_num = *((Elem_t *) buf + index++);
+        PrintStack(&calcdata->data);
         switch (com_num) {
-            case PUSH: {
-                int num = 0;
-                num = *((Elem_t *) buf + index++);
-                push(calcdata, num);
-                break;
-            }
-            case SUB: {
-                sub(calcdata);
-                break;
-            }
-            case DIV: {
-                div(calcdata);
-                break;
-            }
-            case OUT: {
-                out(calcdata);
-                break;
-            }
-            case HLT: {
-                break;
-            }
-            case ADD: {
-                add(calcdata);
-                break;
-            }
-            case MUL: {
-                mul(calcdata);
-                break;
-            }
-            case SQRT: {
-                sqrt(calcdata);
-                break;
-            }
-            case SIN: {
-                sinus(calcdata);
-                break;
-            }
-            case COS: {
-                cosinus(calcdata);
-                break;
-            }
-            case IN: {
-                in(calcdata);
-                break;
-            }
-
-            case PUSH_R: {
-                Elem_t reg_num = 0;
-                reg_num = *((Elem_t *) buf + index++);
-                if (reg_num >= NUM_OF_REGS || reg_num < 0) {
-                    printf("\033[31mIncorrect argument for register push\n\033[0m");
-                    break;
-                }
-                push_r(calcdata, reg_num);
-                break;
-            }
-
-            case POP: {
-                Elem_t reg_num = 0;
-                reg_num = *((Elem_t *) buf + index++);
-                if (reg_num >= NUM_OF_REGS || reg_num < 0) {
-                    printf("\033[31mIncorrect argument for register push\n\033[0m");
-                    break;
-                }
-                pop_r(calcdata, reg_num);
-                break;
-            }
-
+            #include "commands.h"
             default: {
-                printf("Incorrect command\n");
+                printf("\033[31mIncorrect command\n\033[0m");
                 break;
             }
         }
-    } while (com_num != HLT);
+    } while (com_num != CMD_HLT);
+
+    #undef DEF_CMD
 
     fileclose(fn);
 
@@ -151,7 +94,7 @@ enum Result CalcDtor(Calc *calcdata) {
     return SUCCESS;
 }
 
-void CalcVerify(Calc *calcdata) {
+int CalcVerify(Calc *calcdata) {
 
     assert(calcdata);
 
@@ -160,9 +103,11 @@ void CalcVerify(Calc *calcdata) {
     int correct_reg = 1;
     if (!calcdata->reg)
         correct_reg = 0;
-    if (error != 0 || !correct_reg)
+    if (error != 0 || !correct_reg) {
         DumpCalc(calcdata, error, correct_reg);
-
+        return 0;
+    }
+    return 1;
 }
 
 void DumpCalc(Calc *calcdata, unsigned int error, int correct_reg) {
@@ -209,6 +154,7 @@ static void div(Calc *calcdata) {
 }
 
 static void out(Calc *calcdata) {
+
     assert(calcdata);
     Elem_t n1 = 0;
     StackPop(&calcdata->data, &n1);

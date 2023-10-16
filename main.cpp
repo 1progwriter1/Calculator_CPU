@@ -10,9 +10,7 @@
 
 int main() {
 
-    FILE *fn = fileopen(input_file, READ);
-    translator(fn);
-    fileclose(fn);
+    assembler(input_file);
 
     Calc example = {};
     CalcCtor(&example);
@@ -23,7 +21,7 @@ int main() {
 
     disassembler(byte_code);
     /* const double PI = 3.14159265;
-    printf("%lg", sin ((double) 30 / (int) pow (10, 0) * PI / 180)); */
+    printf("%lg", (int) sin ((double) 30000 / (int) pow (10, 3) * PI / 180)); */
 
     return SUCCESS;
 

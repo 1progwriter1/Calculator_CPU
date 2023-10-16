@@ -17,3 +17,6 @@ calc:
 	mv assembler.o outputfiles/assembler.o
 	mv disassembler.o outputfiles/disassembler.o
 	mv processor.o outputfiles/processor.o
+
+comp:
+	g++ -c main.cpp func.cpp assembler.cpp disassembler.cpp processor.cpp

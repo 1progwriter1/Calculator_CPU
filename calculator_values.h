@@ -10,33 +10,28 @@
 
 #include "Stack/stack_values.h"
 
-const int LEN_COMMAND_PUSH = 4;
-const int LEN_COMMAND_POP_R = 5;
 const int NUM_OF_REGS = 4;
 const int REG_LEN = 3;
 const int MAX_STRLEN = 10;
 const int MY_SIGN = 'V' + 'L' + 'I';
+const int NUMBER = 1;
+const int STRING = 2;
+const int ARGS = 1;
+const int NO_ARGS = 0;
 
 const char regs[NUM_OF_REGS][4] = {"rax", "rbx", "rcx", "rdx"};
 
-const int NUM_OF_COMMANDS = 12;
-const char commands[NUM_OF_COMMANDS + 1][6] = {"sub", "div", "out", "hlt", "add", "mul", "sqrt", "sin", "cos", "in", "push", "pop", "push"};
+const int NUM_OF_COMMANDS = 13;
+const int COMMAND_LEN = 7;
+const char commands[NUM_OF_COMMANDS][COMMAND_LEN] = {"sub", "div", "out", "hlt", "add", "mul", "sqrt", "sin", "cos", "in", "push", "pop", "push_r"};
+
+#define DEF_CMD(name, code, ...) CMD_##name = code,
 
 enum Commands {
-    SUB,
-    DIV,
-    OUT,
-    HLT,
-    ADD,
-    MUL,
-    SQRT,
-    SIN,
-    COS,
-    IN,
-    PUSH,
-    POP,
-    PUSH_R,
+    #include "commands.h"
 };
+
+#undef DEF_CMD
 
 struct Calc {
     Stack data;

@@ -8,7 +8,7 @@
 enum Result Calculate(Calc *calcdata, const char *file);
 enum Result CalcCtor(Calc *calcdata);
 enum Result CalcDtor(Calc *calcdata);
-void CalcVerify(Calc *calcdata);
+int CalcVerify(Calc *calcdata);
 void DumpCalc(Calc *calcdata, unsigned int error, int correct_reg);
 
 #endif
