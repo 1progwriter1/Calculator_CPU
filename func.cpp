@@ -4,6 +4,17 @@
 #include "calculator_values.h"
 #include <sys/stat.h>
 #include <string.h>
+#include <time.h>
+
+int labels[10] = {};
+
+void SetLabel(const int label_number, const int address) {
+    labels[label_number] = address;
+}
+
+int GetLabel(const int label_number) {
+    return labels[label_number];
+}
 
 int FileVerify(const int sign, const int version_icon, const int version_given) {
 
@@ -50,4 +61,10 @@ char *readfile(FILE *fn, long long int length) {
     fread(buf, sizeof (char), length, fn);
 
     return buf;
+}
+
+int DayNumber() {
+    time_t tm = time(NULL);
+    struct tm *current_time = localtime(&tm);
+    return current_time->tm_yday % 7;
 }

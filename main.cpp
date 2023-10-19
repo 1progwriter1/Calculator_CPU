@@ -20,8 +20,6 @@ int main() {
 
 
     disassembler(byte_code);
-    /* const double PI = 3.14159265;
-    printf("%lg", (int) sin ((double) 30000 / (int) pow (10, 3) * PI / 180)); */
 
     return SUCCESS;
 

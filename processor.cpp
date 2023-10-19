@@ -32,7 +32,7 @@ enum Result Calculate(Calc *calcdata, const char *file) {
     assert(calcdata);
     assert(file);
 
-    const int VERSION = 4;
+    const int VERSION = 6;
 
     long long int len_of_file = filelen(file);
     FILE *fn = fileopen(file, READ);
@@ -48,7 +48,7 @@ enum Result Calculate(Calc *calcdata, const char *file) {
 
     Elem_t com_num = 0;
 
-    #define DEF_CMD(name, code, args, type, ...)\
+    #define DEF_CMD(name, code, args, ...)      \
         case (code): {                          \
             __VA_ARGS__                         \
             break;                              \
@@ -56,7 +56,6 @@ enum Result Calculate(Calc *calcdata, const char *file) {
 
     do {
         com_num = *((Elem_t *) buf + index++);
-        PrintStack(&calcdata->data);
         switch (com_num) {
             #include "commands.h"
             default: {
@@ -126,115 +125,6 @@ void DumpCalc(Calc *calcdata, unsigned int error, int correct_reg) {
     }
 
     dump(&calcdata->data, error);
-}
-
-static void push(Calc *calcdata, Elem_t num) {
-
-    CalcVerify(calcdata);
-
-    StackPush(&calcdata->data, num * MUL_PRES);
-}
-
-static void sub(Calc *calcdata) {
-
-    CalcVerify(calcdata);
-    Elem_t n1 = 0, n2 = 0;
-    StackPop(&calcdata->data, &n1);
-    StackPop(&calcdata->data, &n2);
-    StackPush(&calcdata->data, (n2 - n1));
-}
-
-static void div(Calc *calcdata) {
-
-    CalcVerify(calcdata);
-    Elem_t n1 = 0, n2 = 0;
-    StackPop(&calcdata->data, &n1);
-    StackPop(&calcdata->data, &n2);
-    StackPush(&calcdata->data, (n2 / n1) * MUL_PRES);
-}
-
-static void out(Calc *calcdata) {
-
-    assert(calcdata);
-    Elem_t n1 = 0;
-    StackPop(&calcdata->data, &n1);
-    printf("\033[36mAnswer = \033[0m\033[33m%lg\033[0m\n", (double) n1 / MUL_PRES);
-}
-
-static void mul(Calc *calcdata) {
-
-    CalcVerify(calcdata);
-    Elem_t n1 = 0, n2 = 0;
-    StackPop(&calcdata->data, &n1);
-    StackPop(&calcdata->data, &n2);
-    StackPush(&calcdata->data, n2 * n1 / MUL_PRES);
-}
-
-static void sqrt(Calc *calcdata) {
-
-    CalcVerify(calcdata);
-    Elem_t n1 = 0;
-    StackPop(&calcdata->data, &n1);
-    StackPush(&calcdata->data, (int) (sqrt(n1 / MUL_PRES) * MUL_PRES));
-}
-
-static void sinus(Calc *calcdata) {
-
-    CalcVerify(calcdata);
-    Elem_t n1 = 0;
-    StackPop(&calcdata->data, &n1);
-    StackPush(&calcdata->data, (int) (sin((double) n1 / MUL_PRES * PI / 180) * MUL_PRES));
-}
-
-static void cosinus(Calc *calcdata) {
-
-    CalcVerify(calcdata);
-    Elem_t n1 = 0;
-    StackPop(&calcdata->data, &n1);
-    StackPush(&calcdata->data, (int) (cos((double) n1 / MUL_PRES * PI / 180) * MUL_PRES));
-}
-
-static void in(Calc *calcdata) {
-
-    CalcVerify(calcdata);
-    printf("\033[35mEnter a number: \033[0m");
-    Elem_t num = 0;
-    int correct = 0;
-    do {
-        correct = 1;
-        if (scanf(output_id, &num) != 1) {
-            printf("\033[31mIncorrect input. Try again\033[0m\n");
-            clear();
-            correct = 0;
-        }
-    } while (!correct);
-    StackPush(&calcdata->data, num * MUL_PRES);
-}
-
-static void add(Calc *calcdata) {
-
-    CalcVerify(calcdata);
-    Elem_t n1 = 0, n2 = 0;
-    StackPop(&calcdata->data, &n1);
-    StackPop(&calcdata->data, &n2);
-    StackPush(&calcdata->data, n2 + n1);
-}
-
-static void push_r(Calc *calcdata, int index) {
-
-    CalcVerify(calcdata);
-    Elem_t n = 0;
-    StackPop(&calcdata->data, &n);
-    calcdata->reg[index] = n;
-}
-
-static void pop_r(Calc *calcdata, int index) {
-
-    CalcVerify(calcdata);
-
-    Elem_t n = 0;
-    n = calcdata->reg[index];
-    StackPush(&calcdata->data, n);
 }
 
 void clear() {

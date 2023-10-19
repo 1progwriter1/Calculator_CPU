@@ -6,6 +6,5 @@
 
 enum Result assembler(const char *filename);
 int RegIndex(char *namereg);
-int CommandNumber(char *line);
 
  #endif

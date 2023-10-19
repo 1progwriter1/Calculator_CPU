@@ -15,41 +15,59 @@ enum Result assembler(const char *file) {
     Stack buf = {};
     STACK_CTOR(buf);
 
-    const int VERSION = 4;
+    const int VERSION = 6;
 
     FILE *byte_code_file = fileopen(byte_code, WRITE);
 
     StackPush(&buf, MY_SIGN);
     StackPush(&buf, VERSION);
 
-    #define DEF_CMD(name, code, args, type, ...)                                \
-        if (strcasecmp(str, #name) == 0) {                                      \
-            if (args) {                                                         \
-                Elem_t num = 0;                                                 \
-                int result = fscanf(fn, output_id, &num);                       \
-                if ((result == 1) && (type == NUMBER)) {                        \
-                    StackPush(&buf, code);                                      \
-                    StackPush(&buf, num);                                       \
-                }                                                               \
-                else if (result == -1 && type == STRING) {                      \
-                    StackPush(&buf, code);                                      \
-                    fscanf(fn, "%s", str);                                      \
-                    int index = RegIndex(str);                                  \
-                    if (index == -1) {                                          \
-                        printf("\033[031mIncorrect register name\n\033[0m");    \
-                        return ERROR;                                           \
-                    }                                                           \
-                    StackPush(&buf, index);                                     \
-                }                                                               \
-            }                                                                   \
-            else {                                                              \
-                StackPush(&buf, code);                                          \
-            }                                                                   \
-        }                                                                       \
+    #define DEF_CMD(name, code, args, ...)                                          \
+        if (strcasecmp(str, #name) == 0) {                                          \
+            StackPush(&buf, code);                                                  \
+            if (args) {                                                             \
+                if (code == CMD_PUSH) {                                             \
+                    Elem_t num = 0;                                                 \
+                    if (fscanf(fn, output_id, &num) == 1) {                         \
+                        StackPush(&buf, NUMBER);                                    \
+                        StackPush(&buf, num);                                       \
+                    }                                                               \
+                    else {                                                          \
+                        StackPush(&buf, STRING);                                    \
+                        fscanf(fn, "%s", str);                                      \
+                        int index = RegIndex(str);                                  \
+                        if (index == -1) {                                          \
+                            printf("\033[031mIncorrect register name\n\033[0m");    \
+                            return ERROR;                                           \
+                        }                                                           \
+                        StackPush(&buf, (Elem_t) index);                            \
+                    }                                                               \
+                }                                                                   \
+                else {                                                              \
+                    Elem_t num = 0;                                                 \
+                    if (fscanf(fn, output_id, &num) == 1) {                         \
+                        StackPush(&buf, num);                                       \
+                    }                                                               \
+                    else {                                                          \
+                        fscanf(fn, "%s", str);                                      \
+                        int index = RegIndex(str);                                  \
+                        if (index == -1) {                                          \
+                            printf("\033[031mIncorrect register name\n\033[0m");    \
+                            return ERROR;                                           \
+                        }                                                           \
+                        StackPush(&buf, (Elem_t) index);                            \
+                    }                                                               \
+                }                                                                   \
+            }                                                                       \
+            continue;                                                               \
+        }                                                                           \
 
     char str[MAX_STRLEN] = "";
     while (fscanf(fn, "%s", str) == 1) {
         #include "commands.h"
+        if (str[0] == ':') {
+            SetLabel(str[1] - '0', buf.size);
+        }
     }
     #undef DEF_CMD
     fwrite((int *) buf.data, sizeof (Elem_t), buf.size, byte_code_file);
@@ -71,7 +89,7 @@ int RegIndex(char *namereg) {
     return -1;
 }
 
-void CheckArgsType(const int type, FILE *input, FILE *output) {
+/* void CheckArgsType(const int type, FILE *input, FILE *output) {
 
     assert(input);
     assert(output);
@@ -84,4 +102,4 @@ void CheckArgsType(const int type, FILE *input, FILE *output) {
     if (result == -1 && type = STRING) {
 
     }
-}
+} */

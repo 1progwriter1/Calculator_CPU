@@ -10,20 +10,23 @@
 
 #include "Stack/stack_values.h"
 
-const int NUM_OF_REGS = 4;
 const int REG_LEN = 3;
 const int MAX_STRLEN = 10;
 const int MY_SIGN = 'V' + 'L' + 'I';
-const int NUMBER = 1;
-const int STRING = 2;
 const int ARGS = 1;
 const int NO_ARGS = 0;
+const int NUMBER = 1;
+const int STRING = 0;
+const int MONDAY = 1;
 
-const char regs[NUM_OF_REGS][4] = {"rax", "rbx", "rcx", "rdx"};
+const int REGNAME_LEN = 4;
+const int NUM_OF_REGS = 4;
+const char regs[NUM_OF_REGS][REGNAME_LEN] = {"rax", "rbx", "rcx", "rdx"};
 
 const int NUM_OF_COMMANDS = 13;
-const int COMMAND_LEN = 7;
-const char commands[NUM_OF_COMMANDS][COMMAND_LEN] = {"sub", "div", "out", "hlt", "add", "mul", "sqrt", "sin", "cos", "in", "push", "pop", "push_r"};
+const int COMMAND_LEN = 5;
+
+const char commands[NUM_OF_COMMANDS][COMMAND_LEN] = {"sub", "div", "out", "hlt", "add", "mul", "sqrt", "sin", "cos", "in", "push", "pop", "push"};
 
 #define DEF_CMD(name, code, ...) CMD_##name = code,
 
