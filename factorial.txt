@@ -3,6 +3,7 @@
         push 1
         push rdx
         call fact
+
         pop rax
         out
         hlt
@@ -24,5 +25,5 @@
 :one    pop rdx
         push 1
         mul
-        out
-        hlt
+        push rax
+        ret
