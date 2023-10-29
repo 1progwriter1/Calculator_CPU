@@ -6,15 +6,7 @@
 #include <string.h>
 #include <time.h>
 
-int labels[10] = {};
-
-void SetLabel(const int label_number, const int address) {
-    labels[label_number] = address;
-}
-
-int GetLabel(const int label_number) {
-    return labels[label_number];
-}
+static const int MAX_INPUT_LEN = 50;
 
 int FileVerify(const int sign, const int version_icon, const int version_given) {
 
@@ -42,18 +34,18 @@ FILE *fileopen(const char *filename, const char mode[]) {
     return fn;
 }
 
-long long int filelen(const char *filename) {
+unsigned long filelen(const char *filename) {
 
     assert(filename);
 
     struct stat buf = {};
     if (stat(filename, &buf) == - 1)
-        return -1;
+        return NULL;
 
-    return buf.st_size;
+    return (unsigned long) buf.st_size;
 }
 
-char *readfile(FILE *fn, long long int length) {
+char *readfile(FILE *fn, unsigned long length) {
 
     assert(fn);
 
@@ -67,4 +59,58 @@ int DayNumber() {
     time_t tm = time(NULL);
     struct tm *current_time = localtime(&tm);
     return current_time->tm_yday % 7;
+}
+
+int CheckArgs(const char args, const char arg) {
+
+    return (args & arg) != 0;
+}
+
+int MainArgs(int argc, const char *argv[], maindata *data) {
+
+    assert(argv);
+    assert(argc);
+
+    char line[MAX_INPUT_LEN] = "";
+    for (size_t i = 1; i < (size_t) argc; i++) {
+        if (strcmp(argv[i], "--run") == 0) {
+            data->processor = 1;
+            i++;
+            if (i < (size_t) argc && sscanf(argv[i], "%[^-]", line) != 1) {
+                printf("\033[31mFile name for processor expected\033[0m\n");
+                return 0;
+            }
+            data->proc_file = (int) i;
+            continue;
+        }
+        if (strcmp(argv[i], "--asm") == 0) {
+            data->assembler = 1;
+            i++;
+            if (i < (size_t) argc && sscanf(argv[i], "%[^-]", line) != 1) {
+                printf("\033[31mFile name for assembler expected\033[0m\n");
+                return 0;
+            }
+            data->asm_file_in = (int) i;
+            i++;
+            if (i < (size_t) argc && sscanf(argv[i], "%[^-]", line) == 1)
+                data->asm_file_out = (int) i;
+            continue;
+        }
+        if (strcmp(argv[i], "--disasm") == 0) {
+            data->disassembler = 1;
+            i++;
+            if (i < (size_t) argc && sscanf(argv[i], "%[^-]", line) != 1) {
+                printf("\033[31mFile name for disassembler expected\033[0m\n");
+                return 0;
+            }
+            data->dis_file_in = (int) i;
+            i++;
+            if (i < (size_t) argc && sscanf(argv[i], "%[^-]", line) == 1)
+                data->dis_file_out = (int) i;
+            continue;
+        }
+        printf("\033[31mCommand \"%s\" not found\033[0m\n", argv[i]);
+        return 0;
+    }
+    return 1;
 }

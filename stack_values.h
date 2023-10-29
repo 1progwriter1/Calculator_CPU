@@ -4,7 +4,7 @@
 #include "config.h"
 
 // #define info(stk) PrintInfo(&stk, (char *)__FILE__, (char *)__func__, __LINE__);
-#define STACK_CTOR(stk) StackCtor(&stk, #stk, (char *)__FILE__, __LINE__, (char *)__func__);
+#define STACK_CTOR(stk) StackCtor(&stk, #stk, (const char *)__FILE__, __LINE__, (const char *)__func__);
 
 typedef unsigned long long canary_t;
 
@@ -21,8 +21,8 @@ struct StackInfo {
 struct Stack {
     canary_t canary_left;
     Elem_t *data;
-    int size;
-    int capacity;
+    unsigned long size;
+    unsigned long capacity;
     int id;
     StackInfo info;
     canary_t canary_right;

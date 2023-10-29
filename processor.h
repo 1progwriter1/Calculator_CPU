@@ -5,7 +5,7 @@
 #include "Stack/stack_values.h"
 #include "calculator_values.h"
 
-enum Result Calculate(Calc *calcdata, const char *file);
+enum Result processor(Calc *calcdata, const char *file);
 enum Result CalcCtor(Calc *calcdata);
 enum Result CalcDtor(Calc *calcdata);
 int CalcVerify(Calc *calcdata);

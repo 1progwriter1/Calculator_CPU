@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include "Stack/stack_values.h"
 
-enum Result disassembler(const char *file);
-char *LowName(char *name);
+enum Result disassembler(const char *file, const char *dis_file);
 
 #endif

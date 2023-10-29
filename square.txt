@@ -1,0 +1,76 @@
+        in
+        push rax
+        in
+        push rbx
+        in
+        push rcx
+        pop rax
+        push 0
+        je line
+        call discr
+        pop rdx
+        push 0
+        jb two
+        pop rdx
+        push 0
+        je one
+        pop rdx
+        pop 0
+        ja no
+        hlt
+
+:one    pop rbx
+        push -1
+        mul
+        push 2
+        pop rax
+        mul
+        div
+        out
+        hlt
+
+:discr  pop rbx
+        pop rbx
+        mul
+        pop rax
+        pop rcx
+        mul
+        push 4
+        mul
+        sub
+        push rdx
+        ret
+
+:two    pop rbx
+        push -1
+        mul
+        pop rdx
+        sqrt
+        add
+        push 2
+        pop rax
+        mul
+        div
+        out
+        pop rbx
+        push -1
+        mul
+        pop rdx
+        sqrt
+        sub
+        push 2
+        pop rax
+        mul
+        div
+        out
+        hlt
+
+:no     hlt
+
+:line   pop rcx
+        push -1
+        mul
+        pop rbx
+        div
+        out
+        hlt

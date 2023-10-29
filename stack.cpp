@@ -119,16 +119,16 @@ enum Result StackDtor(Stack *stk) {
 
     #ifdef PROTECT
     free((canary_t *)stk->data - 1);
-    stk->canary_left = -1;
-    stk->canary_right = -1;
+    stk->canary_left = 0;
+    stk->canary_right = 0;
     HashClean(stk->id);
     #else
     free(stk->data);
     #endif
-    stk->capacity = -1;
-    stk->size = -1;
+    stk->capacity = 0;
+    stk->size = 0;
     InfoDetor(&stk->info);
-    stk->id = -1;
+    stk->id = 0;
     return SUCCESS;
 };
 
@@ -143,9 +143,9 @@ void PrintStack(const Stack *stk) {
     else {
         if (stk->data) {
             int col = 0;
-            fprintf(output_file, "capacity = %d\n", stk->capacity);
+            fprintf(output_file, "capacity = %lu\n", stk->capacity);
             for (size_t i = 0; i < stk->capacity && col < 3; i++) {
-                if (memcmp((char *)(stk->data + i), (char *) POISON_PTR, sizeof (Elem_t)) == 0) {
+                if (memcmp((char *)(stk->data + i), (const char *) POISON_PTR, sizeof (Elem_t)) == 0) {
                     col++;
                     fprintf(output_file, "[%lu] = POISON\n", i);
                 }
@@ -167,7 +167,7 @@ unsigned int StackVerify(const Stack *stk) {
 
     unsigned int error = 0;
 
-    int numerror = 1;
+    unsigned int numerror = 1;
 
     if (stk == NULL) {
         error |= numerror;
@@ -252,7 +252,7 @@ static const char* StackStrError (enum Result error) {
     #undef ERR_
     }
 
-void StackDump(unsigned int error, const char *file, const int line, char *func, const Stack *stk) {
+void StackDump(unsigned int error, const char *file, const int line, const char *func, const Stack *stk) {
 
     if (!file)
         fprintf(output_file, "NULL");
@@ -291,12 +291,12 @@ static void PrintInfo(const Stack *stk, const char *file, const char *func, cons
 
     int col = 0;
     fprintf(output_file, "Stack \"%s\" [%p] from \"%s\" (%d)\ncalled from \"%s\" (%d)\n", stk->info.name, stk, stk->info.file, stk->info.line, file, line);
-        fprintf(output_file, "{size = %d\n capacity = %d\n data [%p]\n", stk->size, stk->capacity, stk->data);
+        fprintf(output_file, "{size = %lu\n capacity = %lu\n data [%p]\n", stk->size, stk->capacity, stk->data);
 
     if (stk->capacity > 0 && stk->data) {
         fprintf(output_file, "\t{\n");
         for (size_t i = 0; i < stk->capacity && col < EMPTY_POSITIONS; i++) {
-            if (memcmp((char *)(stk->data + i), (char *) POISON_PTR, sizeof (Elem_t)) == 0) {
+            if (memcmp((char *)(stk->data + i), (const char *) POISON_PTR, sizeof (Elem_t)) == 0) {
                 col++;
                 fprintf(output_file, "\t [%lu] = POISON\n", i);
                 continue;
@@ -363,7 +363,7 @@ static void Poison_fill(Stack *stk) {
 static void SetCanary(Stack *stk) {
 
     assert(stk);
-    int length = sizeof (Elem_t) * SIZESTK + sizeof (canary_t) * 2;
+    unsigned long length = sizeof (Elem_t) * SIZESTK + sizeof (canary_t) * 2;
     stk->data = (Elem_t *) calloc (length, sizeof (char));
 
     if (stk->data) {

@@ -1,0 +1,78 @@
+        push 10000
+        push rax
+        push 0
+        push rbx
+
+:fill   push 0
+        pop [rbx]
+        pop rbx
+        push 1
+        add
+        push rbx
+        pop rbx
+        pop rax
+        ja fill
+
+        in
+        push rdx
+        pop rdx
+        pop rdx
+        mul
+        push rdx
+        push 1
+        push rax
+        push 1
+        push rbx
+
+:draw   call line
+        push 1
+        push rax
+        pop rbx
+        push 1
+        add
+        push rbx
+        pop rbx
+        push 100
+        ja draw
+
+        ramout
+        hlt
+
+:line   call check
+        pop rax
+        push 1
+        add
+        push rax
+        pop rax
+        push 200
+        ja line
+        ret
+
+:check  pop rax
+        push 50
+        sub
+        pop rax
+        push 50
+        sub
+        mul
+        pop rbx
+        push 50
+        sub
+        pop rbx
+        push 50
+        sub
+        mul
+        add
+        pop rdx
+        jae do
+        ret
+
+:do     pop rax
+        pop rbx
+        push 100
+        mul
+        add
+        push rcx
+        push 1
+        pop [rcx]
+        ret

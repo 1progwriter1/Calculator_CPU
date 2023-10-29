@@ -8,18 +8,31 @@
 #include "disassembler.h"
 #include <math.h>
 
-int main() {
+int main(int argc, const char *argv[]) {
 
-    assembler(input_file);
+    maindata data = {};
+    if (!MainArgs(argc, argv, &data))
+        return ERROR;
 
-    Calc example = {};
-    CalcCtor(&example);
+    if (data.assembler) {
+        if (data.asm_file_out != 0)
+            assembler(argv[data.asm_file_in], argv[data.asm_file_out]);
+        else
+            assembler(argv[data.asm_file_in], byte_code);
+    }
 
-    Calculate(&example, byte_code);
+    if (data.processor) {
+        Calc example = {};
+        CalcCtor(&example);
+        processor(&example, argv[data.proc_file]);
+    }
 
-
-
-    disassembler(byte_code);
+    if (data.disassembler) {
+        if (data.dis_file_out != 0)
+            disassembler(argv[data.dis_file_in], argv[data.dis_file_out]);
+        else
+            disassembler(argv[data.dis_file_in], disassem_file);
+    }
 
     return SUCCESS;
 

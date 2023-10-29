@@ -9,43 +9,37 @@
 #include "calculator_values.h"
 #include <string.h>
 
-const int PRECISION = 3;
-const int MUL_PRES = (int) pow(10, PRECISION);
+static const int PRECISION = 3;
+static const int MUL_PRES = (int) pow(10, PRECISION);
 const double PI = 3.14159265;
+const int RAM_SIZE = 10000;
 
-static void push(Calc *calcdata, Elem_t num);
-static void sub(Calc *calcdata);
-static void div(Calc *calcdata);
-static void out(Calc *calcdata);
-static void mul(Calc *calcdata);
-static void sqrt(Calc *calcdata);
-static void sinus(Calc *calcdata);
-static void cosinus(Calc *calcdata);
-static void in(Calc *calcdata);
-static void add(Calc *calcdata);
-static void push_r(Calc *calcdata, int index);
-static void pop_r(Calc *calcdata, int index);
 static void clear();
 
-enum Result Calculate(Calc *calcdata, const char *file) {
+enum Result processor(Calc *calcdata, const char *file) {
 
     assert(calcdata);
     assert(file);
 
-    const int VERSION = 6;
+    const int VERSION = 8;
 
-    long long int len_of_file = filelen(file);
+    Elem_t ram[RAM_SIZE] = {};
+
+    unsigned long len_of_file = filelen(file);
     FILE *fn = fileopen(file, READ);
 
-    char *buf = (char *) calloc (len_of_file + 1, sizeof (char));
+    char *bufptr = (char *) calloc (len_of_file + 1, sizeof (char));
+    char *buf = bufptr;
     fread(buf, sizeof (char), len_of_file, fn);
+    fileclose(fn);
 
     int index = 0;
     Elem_t sign = *((Elem_t *) buf + index++);
     Elem_t file_version = *((Elem_t *) buf + index++);
-    if (!FileVerify(sign, VERSION, file_version))
+    if (!FileVerify((int) sign, VERSION, (int) file_version)) {
+        free(bufptr);
         return ERROR;
-
+    }
     Elem_t com_num = 0;
 
     #define DEF_CMD(name, code, args, ...)      \
@@ -55,11 +49,13 @@ enum Result Calculate(Calc *calcdata, const char *file) {
         }                                       \
 
     do {
+        buf = bufptr;
         com_num = *((Elem_t *) buf + index++);
         switch (com_num) {
             #include "commands.h"
             default: {
-                printf("\033[31mIncorrect command\n\033[0m");
+                printf("\033[31mIncorrect command for <processor> " output_id " %d\n\033[0m", com_num, index - 1);
+                return ERROR;
                 break;
             }
         }
@@ -67,7 +63,7 @@ enum Result Calculate(Calc *calcdata, const char *file) {
 
     #undef DEF_CMD
 
-    fileclose(fn);
+    free(bufptr);
 
     return SUCCESS;
 }
@@ -79,6 +75,8 @@ enum Result CalcCtor(Calc *calcdata) {
 
     STACK_CTOR(calcdata->data);
     calcdata->reg = (Elem_t *) calloc (NUM_OF_REGS, sizeof (Elem_t));
+    STACK_CTOR(calcdata->addresses);
+
 
     return SUCCESS;
 }
@@ -89,6 +87,7 @@ enum Result CalcDtor(Calc *calcdata) {
         return NULL_POINTER;
     StackDtor(&calcdata->data);
     free(calcdata->reg);
+    StackDtor(&calcdata->addresses);
 
     return SUCCESS;
 }
