@@ -14,8 +14,6 @@
         pop rdx
         push 0
         je one
-        pop rdx
-        pop 0
         ja no
         hlt
 
@@ -41,11 +39,14 @@
         push rdx
         ret
 
-:two    pop rbx
+:two    pop rdx
+        sqrt
+        push rdx
+        pop rbx
         push -1
         mul
         pop rdx
-        sqrt
+
         add
         push 2
         pop rax
@@ -56,7 +57,7 @@
         push -1
         mul
         pop rdx
-        sqrt
+
         sub
         push 2
         pop rax
@@ -67,7 +68,10 @@
 
 :no     hlt
 
-:line   pop rcx
+:line   pop rbx
+        push 0
+        je no
+        pop rcx
         push -1
         mul
         pop rbx

@@ -69,7 +69,7 @@ int CheckArgs(const char args, const char arg) {
 int MainArgs(int argc, const char *argv[], maindata *data) {
 
     assert(argv);
-    assert(argc);
+    assert(data);
 
     char line[MAX_INPUT_LEN] = "";
     for (size_t i = 1; i < (size_t) argc; i++) {

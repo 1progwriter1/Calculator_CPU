@@ -9,6 +9,33 @@
 #include "calculator_values.h"
 #include <string.h>
 
+#define VERIFY                      \
+    if (!CalcVerify(calcdata)) {    \
+        free(buf);                  \
+        return ERROR;               \
+    }                               \
+
+#define PUSH_NUM(num) StackPush(&calcdata->data, num)
+
+#define POP_NUM(num) StackPop(&calcdata->data, &num)
+
+#define PUSH_ADR(num) StackPush(&calcdata->addresses, (Elem_t) num);
+
+#define POP_ADR(num) StackPop(&calcdata->addresses, (Elem_t *) &num);
+
+#define INPUT(num)                                                  \
+    int correct = 0;                                                \
+    do {                                                            \
+        correct = 1;                                                \
+        if (scanf(output_id, &num) != 1) {                          \
+            printf("\033[31mIncorrect input. Try again\033[0m\n");  \
+            clear();                                                \
+            correct = 0;                                            \
+        }                                                           \
+    } while (!correct);                                             \
+
+#define GET_ELEM(operation) ((Elem_t *) buf + index operation)
+
 static const int PRECISION = 3;
 static const int MUL_PRES = (int) pow(10, PRECISION);
 const double PI = 3.14159265;
@@ -20,8 +47,6 @@ enum Result processor(Calc *calcdata, const char *file) {
 
     assert(calcdata);
     assert(file);
-
-    const int VERSION = 8;
 
     Elem_t ram[RAM_SIZE] = {};
 
@@ -54,7 +79,7 @@ enum Result processor(Calc *calcdata, const char *file) {
         switch (com_num) {
             #include "commands.h"
             default: {
-                printf("\033[31mIncorrect command for <processor> " output_id " %d\n\033[0m", com_num, index - 1);
+                printf("\033[" RED "mIncorrect command for <processor> " output_id " %d\n\033[0m", com_num, index - 1);
                 return ERROR;
                 break;
             }

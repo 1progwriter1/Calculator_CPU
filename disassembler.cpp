@@ -17,8 +17,6 @@ enum Result disassembler(const char *file, const char *dis_file) {
 
     assert(file);
 
-    const int VERSION = 8;
-
     FILE *byte_code_file = fileopen(file, READ);
     FILE *disass_file = fileopen(dis_file, WRITE);
 
@@ -65,7 +63,7 @@ enum Result disassembler(const char *file, const char *dis_file) {
         switch (com_num) {
             #include "commands.h"
             default: {
-                printf("\033[31mIncorrect command number for <disassembler>\n\033[0m");
+                printf("\033[" RED "mIncorrect command number for <disassembler>\n\033[0m");
                 error = 1;
                 break;
             }
@@ -119,12 +117,16 @@ static Result ArgsRead(const char args, FILE *output, const char name[], int *in
             fprintf(output, " %s\n", regs[*((Elem_t *) buf + (*index)++)]);
             return SUCCESS;
         }
-        if (*((Elem_t *) buf + *index - 1) == RAM + STRING || *((Elem_t *) buf + *index - 1) == RAM + NUMBER) {
+        if (*((Elem_t *) buf + *index - 1) == (RAM | STRING)) {
             PrintLowName(name, output);
-            fprintf(output, " [" output_id "]\n", *((Elem_t *) buf + (*index)++));
+            fprintf(output, " [%s]\n", regs[*((Elem_t *) buf + (*index)++)]);
             return SUCCESS;
         }
-        printf("\033[031mMissing argument in byte_code file for %s\n\033[0m", name);
+        if (*((Elem_t *) buf + *index - 1) == (RAM | NUMBER)) {
+            PrintLowName(name, output);
+            fprintf(output, " [" output_id "]\n", *((Elem_t *) buf + (*index)++));
+        }
+        printf("\033[" RED "mMissing argument in byte_code file for %s\n\033[0m", name);
         return ERROR;
     }
     if (is_number) {
@@ -158,7 +160,7 @@ static void MakeSpaces(Elem_t label, const int NUM_OF_SPACES, FILE *output) {
 
     assert(output);
 
-    for (size_t i = 0; i < NUM_OF_SPACES; i++) {
+    for (size_t i = 0; i < (size_t) NUM_OF_SPACES; i++) {
         if (i == 0 && label != 0) {
             fprintf(output, ":" output_id, label);
             continue;

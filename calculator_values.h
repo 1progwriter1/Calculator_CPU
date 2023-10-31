@@ -7,6 +7,11 @@
 #define byte_code "byte_code.bin"
 #define disassem_file "dis_file.txt"
 
+#define RED "31"
+#define BLUE "36"
+#define VIOLET "35"
+#define YELLOW "33"
+
 #include "Stack/stack_values.h"
 
 const int REG_LEN = 3;
@@ -19,6 +24,7 @@ const char STRING = 2;
 const int RAM = 4;
 const int MONDAY = 1;
 const int LABELS_NUM = 10;
+const int VERSION = 8;
 
 const int REGNAME_LEN = 4;
 const int NUM_OF_REGS = 4;
