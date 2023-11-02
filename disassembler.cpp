@@ -25,6 +25,11 @@ enum Result disassembler(const char *file, const char *dis_file) {
 
     unsigned long len_of_file = filelen(file);
     char *buf = (char *) calloc (len_of_file + 1, sizeof (char));
+    if (!buf) {
+        fileclose(byte_code_file);
+        fileclose(disass_file);
+        return NO_MEMORY;
+    }
 
     size_t len_of_prog = fread(buf, sizeof (char), len_of_file, byte_code_file) / sizeof (Elem_t);
 
@@ -172,4 +177,23 @@ static void MakeSpaces(Elem_t label, const int NUM_OF_SPACES, FILE *output) {
         }
         fprintf(output, " ");
     }
+}
+
+int GetArgsDisasm(const int argc, const char *argv[], DisasmData *data) {
+
+    assert(argv);
+    assert(data);
+
+    if (argc == 1) {
+        printf("\033[" RED "mFile name expected\n\033[0m");
+        return ERROR;
+    }
+    if (argc == 2) {
+        data->input_file = 1;
+        return SUCCESS;
+    }
+    data->input_file = 1;
+    data->output_file = 2;
+
+    return SUCCESS;
 }

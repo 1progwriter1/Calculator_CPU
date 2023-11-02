@@ -57,6 +57,8 @@ enum Result processor(Calc *calcdata, const char *file) {
     char *buf = bufptr;
     fread(buf, sizeof (char), len_of_file, fn);
     fileclose(fn);
+    if (!bufptr)
+        return NO_MEMORY;
 
     int index = 0;
     Elem_t sign = *((Elem_t *) buf + index++);
@@ -66,6 +68,8 @@ enum Result processor(Calc *calcdata, const char *file) {
         return ERROR;
     }
     Elem_t com_num = 0;
+
+    printf("Processor version %d\nExecutable file: %s\n\n\033[" GREEN "mFile verified\033[0m\n\n", VERSION, file);
 
     #define DEF_CMD(name, code, args, ...)      \
         case (code): {                          \
@@ -154,4 +158,20 @@ void DumpCalc(Calc *calcdata, unsigned int error, int correct_reg) {
 void clear() {
     while (getchar() != '\n')
         ;
+}
+
+int GetFileName(const int argc, const char *argv[], int *file_num) {
+
+    assert(argv);
+    assert(file_num);
+
+    if (argc == 1) {
+        printf("/033[" RED "mFile name expected\n\033[0m");
+        return ERROR;
+    }
+    *file_num = 1;
+    if (argc > 2)
+        printf("/033[" RED "mUnused arguments\033[0m\n");
+
+    return SUCCESS;
 }

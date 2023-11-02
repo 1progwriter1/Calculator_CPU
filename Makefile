@@ -38,3 +38,21 @@ run:
 	mv assembler.o outputfiles/assembler.o
 	mv disassembler.o outputfiles/disassembler.o
 	mv processor.o outputfiles/processor.o
+
+make proc:
+	$(COMP) $(CFLAGS) -c proc.cpp processor.cpp
+	$(COMP) proc.o processor.o outputfiles/func.o outputfiles/stack.o outputfiles/hash.o -o proc.out
+	mv proc.o outputfiles/proc.o
+	mv processor.o outputfiles/processor.o
+
+make asm:
+	$(COMP) $(CFLAGS) -c asm.cpp assembler.cpp
+	$(COMP) asm.o assembler.o outputfiles/func.o outputfiles/my_vector.o outputfiles/label.o outputfiles/labels.o outputfiles/stack.o outputfiles/hash.o  -o asm.out
+	mv asm.o outputfiles/asm.o
+	mv assembler.o outputfiles/assembler.o
+
+make disasm:
+	$(COMP) $(CFLAGS) -c disasm.cpp disassembler.cpp
+	$(COMP) disasm.o disassembler.o outputfiles/func.o outputfiles/my_vector.o outputfiles/label.o outputfiles/labels.o outputfiles/stack.o outputfiles/hash.o -o disasm.out
+	mv disasm.o outputfiles/disasm.o
+	mv disassembler.o outputfiles/disassembler.o

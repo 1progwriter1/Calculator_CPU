@@ -111,7 +111,7 @@ static Result ReadArgs(Labels *fixups, const char args, FILE *input, Vector *buf
             return SUCCESS;
         }
         if (fscanf(input, "[" output_id "]", &num) == 1) {
-            PushBack(buf, RAM | NUMBER); // поьитовое слодение
+            PushBack(buf, RAM | NUMBER);
             PushBack(buf, num);
             return SUCCESS;
         }
@@ -146,12 +146,31 @@ static Result ReadArgs(Labels *fixups, const char args, FILE *input, Vector *buf
             return ERROR;
         }
 
-        if (CMD_JA <= code && code <= CMD_CALL) { //thin abourt
+        if (CMD_JA <= code && code <= CMD_CALL) {
             SetLabel(fixups, str, (int) buf->size, 0);
             PushBack(buf, 0);
         }
         return SUCCESS;
     }
-    printf("\033[" RED "mMissing arguments for %s\n\033[0m", name_cmd); // define colours
+    printf("\033[" RED "mMissing arguments for %s\n\033[0m", name_cmd);
     return ERROR;
+}
+
+int GetArgsAsm(const int argc, const char *argv[], AsmData *data) {
+
+    assert(argv);
+    assert(data);
+
+    if (argc == 1) {
+        printf("\033[" RED "mFile name expected\n\033[0m");
+        return ERROR;
+    }
+    if (argc == 2) {
+        data->input_file = 1;
+        return SUCCESS;
+    }
+    data->input_file = 1;
+    data->output_file = 2;
+
+    return SUCCESS;
 }

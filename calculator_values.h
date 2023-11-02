@@ -10,6 +10,7 @@
 #define RED "31"
 #define BLUE "36"
 #define VIOLET "35"
+#define GREEN "32"
 #define YELLOW "33"
 
 #include "Stack/stack_values.h"

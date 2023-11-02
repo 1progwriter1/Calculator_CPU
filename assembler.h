@@ -4,7 +4,15 @@
 #include <stdio.h>
 #include "Stack/stack_values.h"
 
+#define proc_code_file "byte_code.bin"
+
+struct AsmData {
+    int input_file;
+    int output_file;
+};
+
 enum Result assembler(const char *file, const char *outfile);
 int RegIndex(char *namereg);
+int GetArgsAsm(const int argc, const char *argv[], AsmData *data);
 
  #endif

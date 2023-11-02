@@ -5,6 +5,7 @@
 #include "Stack/stack_values.h"
 #include "calculator_values.h"
 
+int GetFileName(const int argc, const char *argv[], int *file_num);
 enum Result processor(Calc *calcdata, const char *file);
 enum Result CalcCtor(Calc *calcdata);
 enum Result CalcDtor(Calc *calcdata);
