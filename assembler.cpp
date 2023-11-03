@@ -64,7 +64,9 @@ enum Result assembler(const char *file, const char *outfile) {
     size_t index = 0;
     while (fixups[index].name) {
         for (size_t i = 0; i < (size_t) fixups[index].currant_address; i++)
-            buf.data[fixups[index].program_address[i]] = fixups[index].address;
+            if (fixups[index].program_address + i) {
+                buf.data[fixups[index].program_address[i]] = fixups[index].address;
+            }
         free(fixups[index].name);
         free(fixups[index].program_address);
         index++;

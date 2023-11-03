@@ -84,7 +84,7 @@ DEF_CMD (PUSH, 10, NUMBER + STRING + RAM,           \
         break;                                      \
     }                                               \
     else {                                          \
-        if (type == STRING +RAM)                    \
+        if (type == (STRING | RAM))                 \
             num = ram[calcdata->reg[n]];            \
         else                                        \
             num = ram[n];                           \
@@ -154,3 +154,9 @@ DEF_CMD(RAMOUT, 21, NO_ARGS,                            \
         if ((i + 1) % (size_t) sqrt (RAM_SIZE) == 0)    \
             printf("\n");                               \
     })                                                  \
+
+DEF_CMD(OUTC, 22, NO_ARGS,              \
+    VERIFY;                             \
+    Elem_t sym = 0;                     \
+    POP_NUM(sym);                       \
+    printf("%c", sym / MUL_PRES);)

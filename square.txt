@@ -1,80 +1,100 @@
-        in
+		in
         push rax
-        in
+		in
         push rbx
-        in
+		in
         push rcx
         pop rax
         push 0
-        je line
-        call discr
+        je 131
+        call 43
         pop rdx
         push 0
-        jb two
+        jb 83
         pop rdx
         push 0
-        je one
-        ja no
-        hlt
-
-:one    pop rbx
-        push -1
-        mul
-        push 2
-        pop rax
-        mul
-        div
-        out
-        hlt
-
-:discr  pop rbx
+        je 66
+        jmp 162
+		hlt
+:43     pop rbx
         pop rbx
-        mul
+		mul
         pop rax
         pop rcx
-        mul
+		mul
         push 4
-        mul
-        sub
+		mul
+		sub
         push rdx
-        ret
-
-:two    pop rdx
-        sqrt
+		ret
+:66     pop rbx
+        push -1
+		mul
+        push 2
+        pop rax
+		mul
+		div
+		out
+		hlt
+:83     pop rdx
+		sqrt
         push rdx
         pop rbx
         push -1
-        mul
+		mul
         pop rdx
-
-        add
+		add
         push 2
         pop rax
-        mul
-        div
-        out
+		mul
+		div
+		out
         pop rbx
         push -1
-        mul
+		mul
         pop rdx
-
-        sub
+		sub
         push 2
         pop rax
-        mul
-        div
-        out
-        hlt
-
-:no     hlt
-
-:line   pop rbx
+		mul
+		div
+		out
+		hlt
+:131    pop rbx
         push 0
-        je no
+        je 152
         pop rcx
         push -1
-        mul
+		mul
         pop rbx
-        div
-        out
-        hlt
+		div
+		out
+		hlt
+:152    pop rcx
+        push 0
+        je 183
+        jmp 162
+:162    push 78
+		outc
+        push 79
+		outc
+        push 95
+		outc
+        push 82
+		outc
+        push 10
+		outc
+		hlt
+:183    push 73
+		outc
+        push 78
+		outc
+        push 70
+		outc
+        push 95
+		outc
+        push 82
+		outc
+        push 10
+		outc
+		hlt

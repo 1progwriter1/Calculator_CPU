@@ -56,3 +56,9 @@ make disasm:
 	$(COMP) disasm.o disassembler.o outputfiles/func.o outputfiles/my_vector.o outputfiles/label.o outputfiles/labels.o outputfiles/stack.o outputfiles/hash.o -o disasm.out
 	mv disasm.o outputfiles/disasm.o
 	mv disassembler.o outputfiles/disassembler.o
+
+full:
+	make calc
+	make proc
+	make asm
+	make disasm
