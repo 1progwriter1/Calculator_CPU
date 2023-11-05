@@ -8,18 +8,18 @@
 
 static const int MAX_INPUT_LEN = 50;
 
-int FileVerify(const int sign, const int version_icon, const int version_given) {
+int FileVerify(const int signature, const int version_given) {
 
-    if (sign != MY_SIGN) {
-        printf("\033[31mUnable to read file\n\033[0m");
-        return 0;
+    if (signature != BYTE_CODE_SIGNATURE) {
+        printf(RED "Unable to read file\n" END_OF_COLOR);
+        return ERROR;
     }
 
-    if (version_given != version_icon) {
-        printf("\033[31mIncompatible version\n\033[0m");
-        return 0;
+    if (version_given != VERSION) {
+        printf(RED "Incompatible version\n" END_OF_COLOR);
+        return ERROR;
     }
-    return 1;
+    return SUCCESS;
 }
 
 FILE *fileopen(const char *filename, const char mode[]) {

@@ -4,19 +4,22 @@
         push rbx
 		in
         push rcx
+
         pop rax
         push 0
-        je 131
-        call 43
+        je line
+
+        call discr
         pop rdx
         push 0
-        jb 83
+        jb two
         pop rdx
         push 0
-        je 66
-        jmp 162
+        je one
+        jmp no
 		hlt
-:43     pop rbx
+
+:discr  pop rbx
         pop rbx
 		mul
         pop rax
@@ -27,7 +30,8 @@
 		sub
         push rdx
 		ret
-:66     pop rbx
+
+:one    pop rbx
         push -1
 		mul
         push 2
@@ -36,7 +40,8 @@
 		div
 		out
 		hlt
-:83     pop rdx
+
+:two    pop rdx
 		sqrt
         push rdx
         pop rbx
@@ -60,9 +65,10 @@
 		div
 		out
 		hlt
-:131    pop rbx
+
+:line   pop rbx
         push 0
-        je 152
+        je check
         pop rcx
         push -1
 		mul
@@ -70,11 +76,13 @@
 		div
 		out
 		hlt
-:152    pop rcx
+
+:check  pop rcx
         push 0
-        je 183
-        jmp 162
-:162    push 78
+        je inf
+        jmp no
+
+:no     push 78
 		outc
         push 79
 		outc
@@ -85,7 +93,8 @@
         push 10
 		outc
 		hlt
-:183    push 73
+
+:inf    push 73
 		outc
         push 78
 		outc

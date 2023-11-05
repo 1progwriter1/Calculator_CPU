@@ -16,22 +16,22 @@ int main(int argc, const char *argv[]) {
 
     if (data.assembler) {
         if (data.asm_file_out != 0)
-            assembler(argv[data.asm_file_in], argv[data.asm_file_out]);
+            CodeCompile(argv[data.asm_file_in], argv[data.asm_file_out]);
         else
-            assembler(argv[data.asm_file_in], byte_code);
+            CodeCompile(argv[data.asm_file_in], byte_code);
     }
 
     if (data.processor) {
         Calc example = {};
         CalcCtor(&example);
-        processor(&example, argv[data.proc_file]);
+        ExecuteProgram(&example, argv[data.proc_file]);
     }
 
     if (data.disassembler) {
         if (data.dis_file_out != 0)
-            disassembler(argv[data.dis_file_in], argv[data.dis_file_out]);
+            CodeTranslate(argv[data.dis_file_in], argv[data.dis_file_out]);
         else
-            disassembler(argv[data.dis_file_in], disassem_file);
+            CodeTranslate(argv[data.dis_file_in], disassem_file);
     }
 
     return SUCCESS;

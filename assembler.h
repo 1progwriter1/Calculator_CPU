@@ -11,8 +11,7 @@ struct AsmData {
     int output_file;
 };
 
-enum Result assembler(const char *file, const char *outfile);
-int RegIndex(char *namereg);
+enum Result CodeCompile(const char *file, const char *outfile);
 int GetArgsAsm(const int argc, const char *argv[], AsmData *data);
 
  #endif

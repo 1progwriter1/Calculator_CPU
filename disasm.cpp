@@ -11,11 +11,11 @@ int main(const int argc, const char *argv[]) {
         return ERROR;
 
     if (data.output_file != 0) {
-        if (disassembler(argv[1], argv[2]) != SUCCESS)
+        if (CodeTranslate(argv[1], argv[2]) != SUCCESS)
             return ERROR;
     }
     else {
-        if (disassembler(argv[1], disasm_file) != SUCCESS)
+        if (CodeTranslate(argv[1], disassembler_file) != SUCCESS)
             return ERROR;
     }
 

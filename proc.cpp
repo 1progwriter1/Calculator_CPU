@@ -10,11 +10,13 @@ int main(const int argc, const char *argv[]) {
     if (GetFileName(argc, argv, &file_num) != SUCCESS)
         return ERROR;
 
-    Calc example = {};
-    CalcCtor(&example);
+    Calc processor = {};
+    CalcCtor(&processor);
 
-    if (processor(&example, argv[file_num]) != SUCCESS)
+    if (ExecuteProgram(&processor, argv[file_num]) != SUCCESS)
         return ERROR;
+
+    CalcDtor(&processor);
 
     return SUCCESS;
 }

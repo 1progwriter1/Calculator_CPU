@@ -1,4 +1,4 @@
-struct Labels {
+struct Label {
     char *name;
     int address;
     int *program_address;
@@ -8,4 +8,4 @@ struct Labels {
 
 const int START_LABELS_COL = 8;
 
-int SetLabel(Labels *fixups, char *name, int current_address, int address);
+int SetLabel(Label *labels, char *name, int current_address, int address);

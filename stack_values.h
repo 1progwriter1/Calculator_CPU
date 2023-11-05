@@ -44,6 +44,7 @@ enum Result {
     NULL_POINTER,
     ERROR,
     EMPTY,
+    FILEOPEN_ERROR,
 };
 
 #endif

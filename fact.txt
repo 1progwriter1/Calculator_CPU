@@ -1,0 +1,25 @@
+        in
+        push rax
+        call fact
+
+        pop rbx
+        out
+        hlt
+
+:fact   pop rax
+        push 1
+        jae one
+        pop rax
+        pop rax
+        push 1
+        sub
+        push rax
+        call fact
+        pop rbx
+        mul
+        push rbx
+        ret
+
+:one    push 1
+        push rbx
+        ret
