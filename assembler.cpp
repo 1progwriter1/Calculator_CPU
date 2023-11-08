@@ -11,43 +11,146 @@
 
 const int VEC_SIZE = 8;
 
-static Result ReadArgs(Label *labels, const char args, FILE *input, Vector *buf, const char name[]);
-static int PrepareForCompilation(Vector *buf, Label *labels, FILE *input_file, FILE *output_file);
-static int FillLabels(Vector *buf, Label *labels);
-static int EndCompilation(FILE *code_file, FILE *byte_code_file, Vector *buf, Label *labels);
-static int DoCodeCompilation(FILE *byte_code_file, Vector *buf, Label *labels);
+static Result ReadArgs(AsmData *data, const char args, const char name_cmd[]);
+static int PrepareForCompilation(AsmData *data);
+static int FillLabels(Vector *buf, Labels *lbls);
+static int EndCompilation(AsmData *data);
+static int DoCodeCompilation(AsmData *data);
 static int RegIndex(char *namereg, const size_t len_of_str);
+static void SkipLine(FILE *fn);
+static int GetAsmData(AsmData *data, const char *input_file, const char *output_file);
 
 enum Result CodeCompile(const char *input_file, const char *output_file) {
 
     assert(input_file);
     assert(output_file);
 
-    Vector buf = {};
-    Label *labels = (Label *) calloc ((size_t) START_LABELS_COL, sizeof (Label));
-    FILE *code_file = fileopen(input_file, READ);
-    FILE *byte_code_file = fileopen(output_file, WRITE);
+    AsmData data = {};
+    GetAsmData(&data, input_file, output_file);
 
-    if (PrepareForCompilation(&buf, labels, code_file, byte_code_file) != SUCCESS)
+    if (PrepareForCompilation(&data) != SUCCESS) {
         return ERROR;
-
-    assert(labels);
-
-    int error = 0;
-    if (DoCodeCompilation(code_file, &buf, labels) != SUCCESS)
-        error = 1;
-
-    if (!error) {
-        buf.data[INDEX_OF_CODE_LEN] = (Elem_t) buf.size;
-        fwrite((Elem_t *) buf.data, sizeof (Elem_t), buf.size, byte_code_file);
     }
 
-    EndCompilation(code_file, byte_code_file, &buf, labels);
+    bool error = 0;
+    if (DoCodeCompilation(&data) != SUCCESS) {
+        error = 1;
+    }
+
+    if (!error) {
+        data.buf.data[INDEX_OF_CODE_LEN] = (Elem_t) data.buf.size;
+        fwrite((Elem_t *) data.buf.data, sizeof (Elem_t), data.buf.size, data.byte_code_file);
+    }
+
+    EndCompilation(&data);
 
     if (error)
         return ERROR;
 
     return SUCCESS;
+}
+
+static int PrepareForCompilation(AsmData *data) {
+
+    assert(data);
+
+    if (LabelsCtor(&data->lbls) != SUCCESS)
+        return ERROR;
+
+    if (!data->code_file) {
+        LabelsDtor(&data->lbls);
+        fileclose(data->byte_code_file);
+        return FILEOPEN_ERROR;
+    }
+
+    if (!data->byte_code_file) {
+        LabelsDtor(&data->lbls);
+        fileclose(data->code_file);
+        return FILEOPEN_ERROR;
+    }
+
+    if (VectorCtor(&data->buf, VEC_SIZE) != SUCCESS) {
+        LabelsDtor(&data->lbls);
+        fileclose(data->code_file);
+        fileclose(data->byte_code_file);
+    }
+
+    PushBack(&data->buf, 0);
+    PushBack(&data->buf, BYTE_CODE_SIGNATURE);
+    PushBack(&data->buf, VERSION);
+
+    return SUCCESS;
+}
+
+static int DoCodeCompilation(AsmData *data) {
+
+    assert(data);
+    assert(&data->buf);
+    assert(data->code_file);
+
+    bool error = 0;
+
+    #define DEF_CMD(name_cmd, code, args, ...)                      \
+        if (strcasecmp(#name_cmd, str) == 0) {                      \
+            PushBack(&data->buf, code);                             \
+            if (args) {                                             \
+                if (ReadArgs(data, args, #name_cmd) != SUCCESS) {   \
+                    error = 1;                                      \
+                    break;                                          \
+                }                                                   \
+            }                                                       \
+            continue;                                               \
+        }                                                           \
+
+    char str[MAX_STRLEN] = "";
+    while (fscanf(data->code_file, "%s", str) == 1 && !error) {
+        if (str[0] == ':') {
+            SetLabel(&data->lbls, (char *) str + 1, NO_ADDRESS, (int) (data->buf).size);
+            continue;
+        }
+        if (str[0] == ';')  {
+            SkipLine(data->code_file);
+            continue;
+        }
+
+        #include "commands.h"
+
+        printf(RED "Incorrect command in <CodeCompile>: %s" END_OF_COLOR "\n", str);
+        error = 1;
+    }
+
+    #undef DEF_CMD
+
+    if (error)
+        return ERROR;
+
+    FillLabels(&data->buf, &data->lbls);
+
+    return SUCCESS;
+}
+
+static int EndCompilation(AsmData *data) {
+
+    assert(data);
+    assert(data->code_file);
+    assert(data->byte_code_file);
+    assert(&data->buf);
+    assert(&data->lbls);
+
+    fileclose(data->byte_code_file);
+    fileclose(data->code_file);
+    LabelsDtor(&data->lbls);
+    VectorDtor(&data->buf);
+
+    return SUCCESS;
+}
+
+static void SkipLine(FILE *fn) {
+
+    assert(fn);
+
+    while (fgetc(fn) != '\n')
+        ;
 }
 
 static int RegIndex(char *namereg, const size_t len_of_str) {
@@ -61,195 +164,96 @@ static int RegIndex(char *namereg, const size_t len_of_str) {
     return -1;
 }
 
-static Result ReadArgs(Label *fixups, const char args, FILE *input, Vector *buf, const char name_cmd[]) {
+static Result ReadArgs(AsmData *data, const char args, const char name_cmd[]) {
 
-    assert(input);
-    assert(buf);
+    assert(data);
+    assert(data->code_file);
+    assert(&data->buf);
+    assert(&data->lbls);
 
-    int is_ram_access = (args & RAM_ACCESS) != 0;
-    int is_number     = (args & NUMBER) != 0;
-    int is_string     = (args & STRING) != 0;
+    bool is_ram_access = (args & RAM_ACCESS) != 0;
+    bool is_number     = (args & NUMBER) != 0;
+    bool is_string     = (args & STRING) != 0;
 
     char str[MAX_STRLEN] = "";
     size_t len_of_str = 0;
-    Elem_t num = 0;
-    int ind_of_reg = 0;
-    if ((is_number + is_string + is_ram_access) > 1) {
-        if (fscanf(input, output_id, &num) == 1) {
-            PushBack(buf, NUMBER);
-            PushBack(buf, num);
-            return SUCCESS;
+    Elem_t type_of_arg = NO_ARGS;
+    Elem_t arg = 0;
+    bool incorrect_arg = 0;
+
+    if (is_number + is_string + is_ram_access > 1) {
+        if (fscanf(data->code_file, output_id, &arg) == 1) {
+            type_of_arg = NUMBER;
         }
-        if (fscanf(input, "[" output_id, &num) == 1) {
-            PushBack(buf, RAM_ACCESS | NUMBER);
-            PushBack(buf, num);
-            return SUCCESS;
+        else if (fscanf(data->code_file, "[" output_id, &arg) == 1) {
+            type_of_arg = RAM_ACCESS | NUMBER;
         }
-        if (fscanf(input, "%s", str) == 1) {
+        else if (fscanf(data->code_file, "%s", str) == 1) {
             len_of_str = strlen(str);
             if (str[len_of_str - 1] == ']') {
-                PushBack(buf, RAM_ACCESS | STRING);
-                if ((ind_of_reg = RegIndex(str, len_of_str- 1)) == -1) {
-                    printf(RED "3Incorrect argument for %s" END_OF_COLOR "\n", name_cmd);
-                    return ERROR;
-                }
-                PushBack(buf, ind_of_reg);
-                return SUCCESS;
+                type_of_arg = RAM_ACCESS | STRING;
+                if ((arg = RegIndex(str, len_of_str- 1)) == -1)
+                    incorrect_arg = 1;
             } else {
-                if ((ind_of_reg = RegIndex(str, len_of_str)) == -1) {
-                    printf(RED "Incorrect argument for %s" END_OF_COLOR "\n", name_cmd);
-                    return ERROR;
-                }
-                PushBack(buf, STRING);
-                PushBack(buf, ind_of_reg);
-                return SUCCESS;
+                if ((arg = RegIndex(str, len_of_str)) == -1)
+                    incorrect_arg = 1;
+                type_of_arg = STRING;
             }
         }
+    }
+    else if (is_number) {
+        if (fscanf(data->code_file, output_id, &arg) != 1)
+            incorrect_arg = 1;
+    }
+    else if (is_string) {
+        if (fscanf(data->code_file, "%s", str) != 1) {
+            incorrect_arg = 1;
+        }
+        else {
+            SetLabel(&data->lbls, str, (int) data->buf.size, NO_ADDRESS);
+            arg = 0;
+        }
+    }
+    else {
         printf(RED "Missing arguments for %s" END_OF_COLOR "\n", name_cmd);
         return ERROR;
     }
-    if (is_number) {
-        if (fscanf(input, output_id, &num) != 1) {
-            printf(RED "Incorrect argument for %s" END_OF_COLOR "\n", name_cmd);
-            return ERROR;
-        }
-        PushBack(buf, num);
-        return SUCCESS;
+
+    if (incorrect_arg) {
+        printf(RED "Incorrect argument for %s" END_OF_COLOR "\n", name_cmd);
+        return ERROR;
     }
-    if (is_string) {
-        if (fscanf(input, "%s", str) != 1) {
-            printf(RED "Incorrect argument for %s" END_OF_COLOR "\n", name_cmd);
-            return ERROR;
-        }
-        len_of_str = strlen(str);
-        if (RegIndex(str, len_of_str) == -1) {
-            SetLabel(fixups, str, (int) buf->size, 0);
-            PushBack(buf, 0);
-        }
-        return SUCCESS;
-    }
-    printf(RED "Missing arguments for %s" END_OF_COLOR "\n", name_cmd);
-    return ERROR;
+
+    if (type_of_arg != NO_ARGS)
+        PushBack(&data->buf, type_of_arg);
+    PushBack(&data->buf, arg);
+
+    return SUCCESS;
 }
 
-int GetArgsAsm(const int argc, const char *argv[], AsmData *data) {
+static int FillLabels(Vector *buf, Labels *lbls) {
 
-    assert(argv);
+    assert(buf);
+    assert(lbls);
+
+    for (size_t i = 0; i < (size_t) lbls->current; i++) {
+        for (size_t j = 0; j < (size_t) (lbls->data + i)->current; j++)
+            buf->data[(lbls->data + i)->addresses_to_fill[j]] = (lbls->data + i)->address;
+    }
+
+    return SUCCESS;
+}
+
+static int GetAsmData(AsmData *data, const char *input_file, const char *output_file) {
+
     assert(data);
+    assert(input_file);
+    assert(output_file);
 
-    if (argc == 1) {
-        printf(RED "File name expected" END_OF_COLOR "\n");
-        return ERROR;
-    }
-    if (argc == 2) {
-        data->input_file = 1;
-        return SUCCESS;
-    }
-    data->input_file = 1;
-    data->output_file = 2;
-
-    return SUCCESS;
-}
-
-static int PrepareForCompilation(Vector *buf, Label *labels, FILE *code_file, FILE *byte_code_file) {
-
-    assert(buf);
-
-    labels = (Label *) calloc ((size_t) START_LABELS_COL, sizeof (Label));
-    if (!labels)
-        return NO_MEMORY;
-
-    if (!code_file) {
-        fileclose(byte_code_file);
-        return FILEOPEN_ERROR;
-    }
-
-    if (!byte_code_file) {
-        fileclose(code_file);
-        return FILEOPEN_ERROR;
-    }
-
-    VectorCtor(buf, VEC_SIZE);
-
-    PushBack(buf, 0);
-    PushBack(buf, BYTE_CODE_SIGNATURE);
-    PushBack(buf, VERSION);
-
-    return SUCCESS;
-}
-
-static int FillLabels(Vector *buf, Label *labels) {
-
-    assert(buf);
-    assert(labels);
-
-    size_t index = 0;
-    while (labels[index].name) {
-        for (size_t i = 0; i < (size_t) labels[index].currant_address; i++)
-            if (labels[index].program_address + i) {
-                buf->data[labels[index].program_address[i]] = labels[index].address;
-            }
-        free(labels[index].name);
-        free(labels[index].program_address);
-        index++;
-    }
-
-    return SUCCESS;
-}
-
-static int EndCompilation(FILE *code_file, FILE *byte_code_file, Vector *buf, Label *labels) {
-
-    assert(code_file);
-    assert(byte_code_file);
-    assert(buf);
-    assert(labels);
-
-    fileclose(byte_code_file);
-    fileclose(code_file);
-    free(labels);
-    VectorDtor(buf);
-
-    return SUCCESS;
-}
-
-static int DoCodeCompilation(FILE *code_file, Vector *buf, Label *labels) {
-
-    assert(code_file);
-    assert(buf);
-
-    int error = 0;
-
-    #define DEF_CMD(name_cmd, code, args, ...)                                      \
-        if (strcasecmp(#name_cmd, str) == 0) {                                      \
-            PushBack(buf, code);                                                    \
-            if (args) {                                                             \
-                if (ReadArgs(labels, args, code_file, buf, #name_cmd) != SUCCESS) { \
-                    error = 1;                                                      \
-                    break;                                                          \
-                }                                                                   \
-            }                                                                       \
-            continue;                                                               \
-        }                                                                           \
-
-    char str[MAX_STRLEN] = "";
-    while (fscanf(code_file, "%s", str) == 1 && !error) {
-        #include "commands.h"
-        if (str[0] == ':') {
-            SetLabel(labels, (char *) str + 1, -1, (int) buf->size);
-            continue;
-        }
-        else {
-            printf(RED "Incorrect command in <CodeCompile>: %s" END_OF_COLOR "\n", str);
-            error = 1;
-        }
-    }
-
-    #undef DEF_CMD
-
-    if (error)
-        return ERROR;
-
-    FillLabels(buf, labels);
+    data->buf = {};
+    data->lbls = {};
+    data->code_file = fileopen(input_file, READ);
+    data->byte_code_file = fileopen(output_file, WRITE);
 
     return SUCCESS;
 }

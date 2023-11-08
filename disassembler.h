@@ -3,15 +3,19 @@
 
 #include <stdio.h>
 #include "Stack/stack_values.h"
+#include "my_vector.h"
 
-#define disassembler_file "dis_file.txt"
+#define disasm_file "dis_file.txt"
 
 struct DisasmData {
-    int input_file;
-    int output_file;
+    char *buf;
+    Vector labels;
+    unsigned long len_of_file;
+    Elem_t len_of_prog;
+    FILE *dst_file;
+    const char *byte_code_file;
 };
 
 enum Result CodeTranslate(const char *file, const char *dis_file);
-int GetArgsDisasm(const int argc, const char *argv[], DisasmData *data);
 
 #endif

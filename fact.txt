@@ -1,25 +1,25 @@
         in
-        push rax
+        pop rax
         call fact
 
-        pop rbx
+        push rbx
         out
         hlt
 
-:fact   pop rax
+:fact   push rax
         push 1
         jae one
-        pop rax
-        pop rax
+        push rax
+        push rax
         push 1
         sub
-        push rax
+        pop rax
         call fact
-        pop rbx
-        mul
         push rbx
+        mul
+        pop rbx
         ret
 
 :one    push 1
-        push rbx
+        pop rbx
         ret

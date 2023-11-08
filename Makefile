@@ -2,63 +2,35 @@ CFLAGS=-D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Wc++14-compat -Wm
 
 COMP=g++
 
-all:
-	$(COMP) $(CFLAGS) -c main.cpp func.cpp assembler.cpp disassembler.cpp processor.cpp Stack/stack.cpp Stack/hash.cpp my_vector.cpp labels.cpp
-	$(COMP) main.o func.o assembler.o disassembler.o processor.o stack.o hash.o my_vector.o labels.o
-	mv main.o outputfiles/main.o
-	mv labels.o outputfiles/labels.o
-	mv my_vector.o outputfiles/my_vector.o
-	mv func.o outputfiles/func.o
-	mv assembler.o outputfiles/assembler.o
-	mv disassembler.o outputfiles/disassembler.o
-	mv processor.o outputfiles/processor.o
-	mv stack.o outputfiles/stack.o
-	mv hash.o outputfiles/hash.o
-
-calc:
-	$(COMP) $(CFLAGS) -c main.cpp func.cpp assembler.cpp disassembler.cpp processor.cpp my_vector.cpp labels.cpp
-	$(COMP) main.o func.o assembler.o disassembler.o outputfiles/stack.o outputfiles/hash.o processor.o my_vector.o labels.o
-	mv main.o outputfiles/main.o
-	mv labels.o outputfiles/labels.o
-	mv my_vector.o outputfiles/my_vector.o
-	mv func.o outputfiles/func.o
-	mv assembler.o outputfiles/assembler.o
-	mv disassembler.o outputfiles/disassembler.o
-	mv processor.o outputfiles/processor.o
-
 comp:
-	$(COMP) $(CFLAGS) -c main.cpp func.cpp assembler.cpp disassembler.cpp processor.cpp my_vector.cpp labels.cpp
+	$(COMP) $(CFLAGS) -c func.cpp assembler.cpp disassembler.cpp processor.cpp my_vector.cpp labels.cpp asm.cpp disasm.cpp proc.cpp main.cpp
 
 run:
-	$(COMP) $(CFLAGS) main.o func.o assembler.o disassembler.o outputfiles/stack.o outputfiles/hash.o processor.o my_vector.o labels.o
+	$(COMP) $(CFLAGS) func.o assembler.o disassembler.o outputfiles/stack.o outputfiles/hash.o processor.o my_vector.o labels.o main.o
 	mv main.o outputfiles/main.o
-	mv label.o outputfiles/label.o
 	mv labels.o outputfiles/labels.o
 	mv func.o outputfiles/func.o
+	mv my_vector.o outputfiles/my_vector.o
 	mv assembler.o outputfiles/assembler.o
 	mv disassembler.o outputfiles/disassembler.o
 	mv processor.o outputfiles/processor.o
 
-make proc:
+proc:
 	$(COMP) $(CFLAGS) -c proc.cpp processor.cpp
 	$(COMP) proc.o processor.o outputfiles/func.o outputfiles/stack.o outputfiles/hash.o -o proc.out
 	mv proc.o outputfiles/proc.o
 	mv processor.o outputfiles/processor.o
 
-make asm:
+asm:
 	$(COMP) $(CFLAGS) -c asm.cpp assembler.cpp
-	$(COMP) asm.o assembler.o outputfiles/func.o outputfiles/my_vector.o outputfiles/label.o outputfiles/labels.o outputfiles/stack.o outputfiles/hash.o  -o asm.out
+	$(COMP) asm.o assembler.o outputfiles/func.o outputfiles/my_vector.o outputfiles/labels.o outputfiles/stack.o outputfiles/hash.o  -o asm.out
 	mv asm.o outputfiles/asm.o
 	mv assembler.o outputfiles/assembler.o
 
-make disasm:
+disasm:
 	$(COMP) $(CFLAGS) -c disasm.cpp disassembler.cpp
-	$(COMP) disasm.o disassembler.o outputfiles/func.o outputfiles/my_vector.o outputfiles/label.o outputfiles/labels.o outputfiles/stack.o outputfiles/hash.o -o disasm.out
+	$(COMP) disasm.o disassembler.o outputfiles/func.o outputfiles/my_vector.o outputfiles/stack.o outputfiles/hash.o -o disasm.out
 	mv disasm.o outputfiles/disasm.o
 	mv disassembler.o outputfiles/disassembler.o
 
-full:
-	make calc
-	make proc
-	make asm
-	make disasm
+full: proc asm disasm

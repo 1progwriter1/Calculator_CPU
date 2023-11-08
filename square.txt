@@ -1,83 +1,83 @@
 		in
-        push rax
-		in
-        push rbx
-		in
-        push rcx
-
         pop rax
+		in
+        pop rbx
+		in
+        pop rcx
+
+        push rax
         push 0
         je line
 
         call discr
-        pop rdx
+        push rdx
         push 0
         jb two
-        pop rdx
+        push rdx
         push 0
         je one
         jmp no
-		hlt
+		ret
 
-:discr  pop rbx
-        pop rbx
+:discr  push rbx
+        push rbx
 		mul
-        pop rax
-        pop rcx
+        push rax
+        push rcx
 		mul
         push 4
 		mul
 		sub
-        push rdx
+        pop rdx
 		ret
 
-:one    pop rbx
+:one    push rbx
         push -1
 		mul
         push 2
-        pop rax
+        push rax
 		mul
 		div
 		out
 		hlt
 
-:two    pop rdx
+:two    push rdx
 		sqrt
-        push rdx
-        pop rbx
+        pop rdx
+        push rbx
         push -1
 		mul
-        pop rdx
+        push rdx
 		add
         push 2
-        pop rax
+        push rax
 		mul
 		div
 		out
-        pop rbx
+        push rbx
         push -1
 		mul
-        pop rdx
+        push rdx
 		sub
         push 2
-        pop rax
+        push rax
 		mul
 		div
 		out
 		hlt
 
-:line   pop rbx
+:line   push rbx
         push 0
         je check
-        pop rcx
+        push rcx
         push -1
 		mul
-        pop rbx
+        push rbx
 		div
 		out
 		hlt
 
-:check  pop rcx
+:check  push rcx
         push 0
         je inf
         jmp no

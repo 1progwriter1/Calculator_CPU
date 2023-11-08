@@ -1,22 +1,29 @@
 #include <stdio.h>
 #include <assert.h>
 #include "disassembler.h"
+#include "calculator_values.h"
 
 int main(const int argc, const char *argv[]) {
 
     assert(argv);
 
-    DisasmData data = {};
-    if (GetArgsDisasm(argc, argv, &data) != SUCCESS)
-        return ERROR;
+    const char *src = NULL;
+    const char *dst = disasm_file;
 
-    if (data.output_file != 0) {
-        if (CodeTranslate(argv[1], argv[2]) != SUCCESS)
-            return ERROR;
+    if (argc < 2) {
+        printf(RED "File name expected" END_OF_COLOR "\n");
+        return ERROR;
+    }
+    if (argc > 2) {
+        src = argv[1];
+        dst = argv[2];
     }
     else {
-        if (CodeTranslate(argv[1], disassembler_file) != SUCCESS)
-            return ERROR;
+        src = argv[1];
+    }
+
+    if (CodeTranslate(src, dst) != SUCCESS) {
+        return ERROR;
     }
 
     return SUCCESS;

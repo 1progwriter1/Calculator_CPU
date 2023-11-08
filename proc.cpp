@@ -6,17 +6,22 @@ int main(const int argc, const char *argv[]) {
 
     assert(argv);
 
-    int file_num = 0;
-    if (GetFileName(argc, argv, &file_num) != SUCCESS)
+    if (argc < 2) {
+        printf(RED "File name expected" END_OF_COLOR "\n");
+        return ERROR;
+    }
+    const char *execute_file = argv[1];
+
+    CPU processor = {};
+    if (CPUCtor(&processor) != SUCCESS) {
+        printf(RED "CPU creation failed" END_OF_COLOR "\n");
+        return ERROR;
+    }
+
+    if (ExecuteProgram(&processor, execute_file) != SUCCESS)
         return ERROR;
 
-    Calc processor = {};
-    CalcCtor(&processor);
-
-    if (ExecuteProgram(&processor, argv[file_num]) != SUCCESS)
-        return ERROR;
-
-    CalcDtor(&processor);
+    CPUDtor(&processor);
 
     return SUCCESS;
 }

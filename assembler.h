@@ -3,15 +3,18 @@
 
 #include <stdio.h>
 #include "Stack/stack_values.h"
+#include "labels.h"
+#include "my_vector.h"
 
-#define proc_code_file "byte_code.bin"
+#define byte_code "byte_code.bin"
 
 struct AsmData {
-    int input_file;
-    int output_file;
+    Vector buf;
+    Labels lbls;
+    FILE *code_file;
+    FILE *byte_code_file;
 };
 
 enum Result CodeCompile(const char *file, const char *outfile);
-int GetArgsAsm(const int argc, const char *argv[], AsmData *data);
 
- #endif
+#endif

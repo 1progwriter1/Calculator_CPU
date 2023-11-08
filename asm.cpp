@@ -1,22 +1,29 @@
 #include <stdio.h>
 #include <assert.h>
 #include "assembler.h"
+#include "calculator_values.h"
 
 int main(const int argc, const char *argv[]) {
 
     assert(argv);
 
-    AsmData data = {};
-    if (GetArgsAsm(argc, argv, &data) != SUCCESS)
-        return ERROR;
+    const char *src = NULL;
+    const char *dst = byte_code;
 
-    if (data.output_file != 0) {
-        if (CodeCompile(argv[1], argv[2]) != SUCCESS)
-            return ERROR;
+    if (argc < 2) {
+        printf(RED "File name expected" END_OF_COLOR "\n");
+        return ERROR;
+    }
+    if (argc > 2) {
+        src = argv[1];
+        dst = argv[2];
     }
     else {
-        if (CodeCompile(argv[1], proc_code_file) != SUCCESS)
-            return ERROR;
+        src = argv[1];
+    }
+
+    if (CodeCompile(src, dst) != SUCCESS) {
+        return ERROR;
     }
 
     return SUCCESS;

@@ -1,12 +1,17 @@
-typedef long long int vec_t;
+#ifndef VECTOR_CPU
+#define VECTOR_CPU
+
+typedef long long int Vec_t; //VecType_t
 
 struct Vector {
-    vec_t *data;
+    Vec_t *data;
     unsigned long size;
     unsigned long capacity;
 };
 
 int VectorCtor(Vector *vec, unsigned long size);
 int VectorDtor(Vector *vec);
-int PushBack(Vector *vec, vec_t num);
-vec_t Pop(Vector *vec);
+int PushBack(Vector *vec, Vec_t num);
+Vec_t Pop(Vector *vec);
+
+#endif

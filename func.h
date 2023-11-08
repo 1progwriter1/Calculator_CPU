@@ -7,9 +7,8 @@
 FILE *fileopen(const char *filename, const char mode[]);
 unsigned long filelen(const char *filename);
 char *readfile(FILE *fn, unsigned long length);
-int FileVerify(const int signature, const int version_given);
+int FileVerify(Header *filedata);
 int DayNumber();
-int CheckArgs(const char args, const char arg);
-int MainArgs(int argc, const char *argv[], maindata *data);
+
 
 #endif

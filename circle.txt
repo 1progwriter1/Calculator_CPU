@@ -1,78 +1,118 @@
         push 10000
-        push rax
+        pop rax
         push 0
-        push rbx
+        pop rbx
+
+;Function <fill>
+;
+;Filling RAM with zeros
 
 :fill   push 0
         pop [rbx]
-        pop rbx
+        push rbx
         push 1
         add
-        push rbx
         pop rbx
-        pop rax
+        push rbx
+        push rax
         ja fill
 
         in
+        pop rdx
+        call checkr
         push rdx
-        pop rdx
-        pop rdx
+        push rdx
         mul
-        push rdx
+        pop rdx
         push 1
-        push rax
+        pop rax
         push 1
-        push rbx
+        pop rbx
+
+;Function <draw>
+;
+;Fills RAM with correct values
 
 :draw   call line
         push 1
-        push rax
-        pop rbx
+        pop rax
+        push rbx
         push 1
         add
-        push rbx
         pop rbx
+        push rbx
         push 100
         ja draw
 
         ramout
         hlt
 
+;Function <line>
+;
+;Fills part of RAM
+
 :line   call check
-        pop rax
+        push rax
         push 1
         add
-        push rax
         pop rax
+        push rax
         push 200
         ja line
         ret
 
-:check  pop rax
+;Function <check>
+;
+;Checks which value needs to be written to RAM
+
+:check  push rax
         push 50
         sub
-        pop rax
+        push rax
         push 50
         sub
         mul
-        pop rbx
+        push rbx
         push 50
         sub
-        pop rbx
+        push rbx
         push 50
         sub
         mul
         add
-        pop rdx
+        push rdx
         jae do
         ret
 
-:do     pop rax
-        pop rbx
+:do     push rax
+        push rbx
         push 100
         mul
         add
-        push rcx
+        pop rcx
         push 1
         pop [rcx]
         ret
+
+;Function <checkr>
+;
+;Checks the radius value
+
+:checkr push rdx
+        push 50
+        jb err
+        ret
+
+;Function <err>
+;
+;Prints error message
+
+:err    push 69
+        outc
+        push 82
+        outc
+        push 82
+        outc
+        push 10
+        outc
+        hlt

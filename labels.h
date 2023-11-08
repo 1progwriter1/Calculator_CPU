@@ -1,11 +1,25 @@
+#ifndef LABELS_CPU
+#define LABELS_CPU
+
 struct Label {
     char *name;
     int address;
-    int *program_address;
-    int prog_adr_size = 1;
-    int currant_address;
+    int *addresses_to_fill;
+    int size = 1;
+    int current;
 };
 
-const int START_LABELS_COL = 8;
+struct Labels {
+    Label *data;
+    int current;
+    int size;
+};
 
-int SetLabel(Label *labels, char *name, int current_address, int address);
+
+const int NO_ADDRESS = -1;
+
+int SetLabel(Labels *lbls, char *name, int current_address, int address);
+int LabelsCtor(Labels *lbls);
+int LabelsDtor(Labels *lbls);
+
+#endif

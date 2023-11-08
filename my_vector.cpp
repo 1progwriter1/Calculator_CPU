@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include "my_vector.h"
 #include <assert.h>
+#include "calculator_values.h"
 
-static const int INCREASE = 2;
-static const int RAISE = 1;
-static const int CUT = 0;
-static const int MIN_SIZE = 8;
+const int INCREASE = 2;
+const int RAISE_VECTOR = 1;
+const int CUT_VECTOR = 0;
+const int MIN_SIZE = 8;
 
 static int Resize(Vector *vec, const int is_increase);
 
@@ -13,11 +14,14 @@ int VectorCtor(Vector *vec, unsigned long size) {
 
     assert(vec);
 
-    vec->data = (vec_t *) calloc (size, sizeof (vec_t));
+    vec->data = (Vec_t *) calloc (size, sizeof (Vec_t));
+    if (!vec->data)
+        return NO_MEMORY;
+
     vec->size = 0;
     vec->capacity = size;
 
-    return 0;
+    return SUCCESS;
 }
 
 int VectorDtor(Vector *vec) {
@@ -28,22 +32,23 @@ int VectorDtor(Vector *vec) {
     vec->size = 0;
     vec->capacity = 0;
 
-    return 0;
+    return SUCCESS;
 }
 
-int PushBack(Vector *vec, vec_t num) {
+int PushBack(Vector *vec, Vec_t num) {
 
     assert(vec);
 
     if (vec->size >= vec->capacity) {
-        Resize(vec, RAISE);
+        if (Resize(vec, RAISE_VECTOR) != SUCCESS)
+            return NO_MEMORY;
     }
     vec->data[vec->size++] = num;
 
-    return 0;
+    return SUCCESS;
 }
 
-vec_t Pop(Vector *vec) {
+int Pop(Vector *vec, Vec_t *num) {
 
     assert(vec);
 
@@ -51,11 +56,12 @@ vec_t Pop(Vector *vec) {
         return NULL;
     }
 
-    vec_t num = vec->data[--vec->size];
-    if (vec->capacity > MIN_SIZE && vec->capacity - vec->size > vec->capacity - vec->capacity / 2) {
-        Resize(vec, CUT);
+    *num = vec->data[--vec->size];
+    if (vec->capacity > MIN_SIZE && vec->capacity - vec->size > vec->capacity - vec->capacity / INCREASE) {
+        if (Resize(vec, CUT_VECTOR) != SUCCESS)
+            return NO_MEMORY;
     }
-    return num;
+    return SUCCESS;
 
 }
 static int Resize(Vector *vec, const int is_increase) {
@@ -69,12 +75,12 @@ static int Resize(Vector *vec, const int is_increase) {
         vec->capacity /= INCREASE;
     }
 
-    vec->data = (vec_t *) realloc (vec->data, sizeof (vec_t) * vec->capacity);
-    if (vec->data)
-        return 0;
+    vec->data = (Vec_t *) realloc (vec->data, sizeof (Vec_t) * vec->capacity);
+    if (!vec->data)
+        return NO_MEMORY;
 
     for (size_t i = vec->size; i < vec->capacity; i++) {
         vec->data[i] = 0;
     }
-    return 1;
+    return SUCCESS;
 }

@@ -5,11 +5,15 @@
 #include "Stack/stack_values.h"
 #include "calculator_values.h"
 
-int GetFileName(const int argc, const char *argv[], int *file_num);
-enum Result ExecuteProgram(Calc *calcdata, const char *file);
-enum Result CalcCtor(Calc *calcdata);
-enum Result CalcDtor(Calc *calcdata);
-int CalcVerify(Calc *calcdata);
-void DumpCalc(Calc *calcdata, unsigned int error, int correct_reg);
+struct ProcData {
+    CPU *processor;
+    char *buf;
+    const char *filename;
+    unsigned long len_of_file;
+};
+
+enum Result ExecuteProgram(CPU *calcdata, const char *file);
+enum Result CPUCtor(CPU *calcdata);
+enum Result CPUDtor(CPU *calcdata);
 
 #endif

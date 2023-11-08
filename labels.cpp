@@ -2,69 +2,112 @@
 #include "labels.h"
 #include <assert.h>
 #include <string.h>
+#include "calculator_values.h"
 
-static const int INCREASE = 2;
-int current = 0;
-int size = START_LABELS_COL;
-const int NUM_OF_ADR = 1;
-const int LABELS = 0;
-const int PROG_ADR = 1;
+const int INCREASE = 2;
+const int START_ADDR_COL = 2;
+const int START_LABELS_COL = 8;
 
-static int Resize(Label *labels, const int aim, const int number);
+static int ResizeLabels(Labels *lbls);
+static int ResizeAddresses(Label *data);
 
-int SetLabel(Label *labels, char *name, int current_address, int address) {
+int SetLabel(Labels *lbls, char *name, int current_address, int address) {
 
-    assert(labels);
+    assert(lbls);
     assert(name);
 
-    if (current > 0) {
-        for (size_t i = 0; i < (size_t) current; i++) {
-            if (strcmp(name, labels[i].name) == 0) {
-                if (address != 0)
-                    labels[i].address = address;
-                if (current_address != -1)
-                    labels[i].program_address[labels[i].currant_address++] = current_address;
-                return 0;
+    for (size_t i = 0; i < (size_t) lbls->current; i++) {
+        if (strcmp(name, (lbls->data + i)->name) == 0) {
+            if (current_address != NO_ADDRESS) {
+                if ((lbls->data + i)->current + 1 >= (lbls->data + i)->size)
+                    if (ResizeAddresses(lbls->data) != SUCCESS)
+                        return NO_MEMORY;
+                (lbls->data + i)->addresses_to_fill[(lbls->data + i)->current++] = current_address;
             }
+            if (address != NO_ADDRESS)
+                (lbls->data + i)->address = address;
+            return SUCCESS;
         }
     }
-    if (current >= size) {
-        Resize(labels, LABELS, 0);
-    }
-    labels[current].name = (char *) calloc (strlen(name), sizeof (char));
-    memcpy (labels[current].name, name, strlen (name));
-    labels[current].address = address;
-    labels[current].prog_adr_size = NUM_OF_ADR;
-    labels[current].currant_address = 0;
-    labels[current].program_address = (int *) calloc (NUM_OF_ADR, sizeof (int));
-    if (current_address != -1) {
-        if (labels[current].currant_address >= labels[current].prog_adr_size)
-            Resize(labels, PROG_ADR, labels[current].currant_address);
-        labels[current].program_address[labels[current].currant_address++] = current_address;
-    }
-    current++;
+    if (lbls->current + 1 >= lbls->size)
+        if (ResizeLabels(lbls) != SUCCESS)
+            return NO_MEMORY;
 
-    return 0;
+    Label *ptr = lbls->data + lbls->current++;
+    ptr->name = (char *) calloc (strlen(name), sizeof (char));
+    memcpy (ptr->name, name, strlen (name));
+    if (address != NO_ADDRESS)
+        ptr->address = address;
+    ptr->current = 0;
+    ptr->size = START_ADDR_COL;
+    ptr->addresses_to_fill = (int *) calloc (START_ADDR_COL, sizeof (int));
+    if (!ptr->addresses_to_fill)
+        return NO_MEMORY;
+
+    if (current_address != NO_ADDRESS)
+        ptr->addresses_to_fill[ptr->current++] = current_address;
+
+    return SUCCESS;
 }
 
-static int Resize(Label *labels, const int aim, const int number) {
+static int ResizeLabels(Labels *lbls) {
 
-    assert(labels);
+    assert(lbls);
 
-    if (aim == LABELS) {
-        size *= INCREASE;
-        labels = (Label *) realloc (labels, sizeof (Label ) * (unsigned long) size);
-        if (!labels)
-            return 1;
-        return 0;
+    lbls->size *= INCREASE;
+
+    lbls->data = (Label *) realloc (lbls->data, sizeof (Label) * (unsigned long) lbls->size);
+    if (!lbls->data)
+        return NO_MEMORY;
+
+    return SUCCESS;
+}
+
+static int ResizeAddresses(Label *data) {
+
+    assert(data);
+
+    data->addresses_to_fill = (int *) realloc (data->addresses_to_fill, sizeof (int) * (unsigned long) data->size * INCREASE);
+    if (!data->addresses_to_fill)
+        return NO_MEMORY;
+
+    for (size_t i = (size_t) data->size; i < (size_t) data->size * INCREASE; i++)
+        data->addresses_to_fill[i] = 0;
+
+    data->size *= INCREASE;
+
+    return SUCCESS;
+}
+
+int LabelsCtor(Labels *lbls) {
+
+    assert(lbls);
+
+    lbls->data = (Label *) calloc (START_LABELS_COL, sizeof (Label));
+    if (!lbls->data)
+        return NO_MEMORY;
+
+    lbls->current = 0;
+    lbls->size = START_LABELS_COL;
+
+    return SUCCESS;
+}
+
+int LabelsDtor(Labels *lbls) {
+
+    assert(lbls);
+
+    size_t index = 0;
+    while ((lbls->data + index)->name) {
+        free((lbls->data + index)->addresses_to_fill);
+        (lbls->data + index)->address = -1;
+        (lbls->data + index)->current = -1;
+        free((lbls->data + index)->name);
+        (lbls->data + index++)->size = -1;
     }
+    free(lbls->data);
+    lbls->current = -1;
+    lbls->size = -1;
 
-    labels[number].prog_adr_size *= INCREASE;
-    labels[number].program_address = (int *) realloc (labels[number].program_address, sizeof (int) * (unsigned long) labels[number].prog_adr_size);
-    if (!labels[number].currant_address)
-        return 1;
-    for (int i = labels[number].currant_address + 1; i < labels[number].prog_adr_size; i++)
-        labels[number].program_address[i] = 0;
-
-    return 0;
+    return SUCCESS;
 }
