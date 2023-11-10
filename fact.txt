@@ -1,10 +1,22 @@
-        in
+        call main
+        hlt
+
+:main   in
         pop rax
         call fact
 
         push rbx
         out
-        hlt
+        ret
+
+;
+; Function: factorial
+; Сalculates the factorial of the number
+;
+; Args: rax - n
+; Destroys: rax
+; Returns: rbx - n!
+;
 
 :fact   push rax
         push 1

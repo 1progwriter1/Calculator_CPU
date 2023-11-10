@@ -1,4 +1,14 @@
-		in
+        call main
+        hlt
+
+; Function <main>
+;
+; Calculates the roots of the quadratic equation
+;
+; Arguments: rax, rbx, rcx: a, b, c
+; Destroys: rdx
+
+:main   in
         pop rax
 		in
         pop rbx
@@ -19,6 +29,13 @@
         jmp no
 		ret
 
+; Function: <discr>
+;
+; Calculates discriminant
+;
+; Arguments: rax, rbx, rcx: a, b, c
+; Returns: rdx: d
+
 :discr  push rbx
         push rbx
 		mul
@@ -31,7 +48,7 @@
         pop rdx
 		ret
 
-:one    push rbx
+:one    push rbx    ;One root
         push -1
 		mul
         push 2
@@ -39,9 +56,9 @@
 		mul
 		div
 		out
-		hlt
+		ret
 
-:two    push rdx
+:two    push rdx    ;Two roots
 		sqrt
         pop rdx
         push rbx
@@ -64,9 +81,9 @@
 		mul
 		div
 		out
-		hlt
+		ret
 
-:line   push rbx
+:line   push rbx    ;Linear equation
         push 0
         je check
         push rcx
@@ -75,14 +92,14 @@
         push rbx
 		div
 		out
-		hlt
+		ret
 
 :check  push rcx
         push 0
         je inf
         jmp no
 
-:no     push 78
+:no     push 78     ;No roots
 		outc
         push 79
 		outc
@@ -92,9 +109,9 @@
 		outc
         push 10
 		outc
-		hlt
+		ret
 
-:inf    push 73
+:inf    push 73     ;Infinite number of roots
 		outc
         push 78
 		outc
@@ -106,4 +123,4 @@
 		outc
         push 10
 		outc
-		hlt
+		ret

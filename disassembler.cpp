@@ -13,10 +13,11 @@ const int NUM_OF_SPACES = 8;
 static Result ArgsRead(DisasmData *data, const char args, const char name[], int *index);
 static void PrintLowName(const char name[], FILE *out);
 static bool IsLabel(Vector *labels, const int index);
-static void MakeSpaces(Vector *labels, int *index, FILE *output);
+static void MakeSpaces(Vector *labels, const int index, FILE *output);
 static int PrepareForTranslation(DisasmData *data);
 static int DoCodeTranslation(DisasmData *data);
 static int GetDisasmdata(DisasmData *data, const char *byte_code_file, const char *dis_file);
+static int GetLabels(const Elem_t *buf, Vector *labels, const Elem_t len_of_prog);
 
 enum Result CodeTranslate(const char *byte_code_file, const char *dis_file) {
 
@@ -75,9 +76,7 @@ static int PrepareForTranslation(DisasmData *data) {
     }
 
     VectorCtor(&data->labels, LABELS_NUM);
-    for (size_t i = INDEX_OF_CODE_LEN + 2; i < (size_t) data->len_of_prog; i++)
-        if (CMD_JA <= *((Elem_t *) data->buf + i) && *((Elem_t *) data->buf + i) <= CMD_CALL)
-            PushBack(&data->labels, *((Elem_t *) data->buf + i + 1));
+    GetLabels((Elem_t *) data->buf, &data->labels, data->len_of_prog);
 
     return SUCCESS;
 }
@@ -89,13 +88,13 @@ static int DoCodeTranslation(DisasmData *data) {
 
     #define DEF_CMD(name, code, args, ...)                              \
         case (code): {                                                  \
+            MakeSpaces(&data->labels, index - 1, data->dst_file);       \
+            PrintLowName(#name, data->dst_file);                        \
             if (args) {                                                 \
                 if (ArgsRead(data, args, #name, &index) != SUCCESS)     \
                     error = 1;                                          \
             }                                                           \
             else {                                                      \
-                fprintf(data->dst_file, "\t\t");                        \
-                PrintLowName(#name, data->dst_file);                    \
                 fprintf(data->dst_file, "\n");                          \
             }                                                           \
             break;                                                      \
@@ -138,14 +137,11 @@ static Result ArgsRead(DisasmData *data, const char args, const char name[], int
     assert(index);
     assert(&data->labels);
 
-    MakeSpaces(&data->labels, index, data->dst_file);
-    PrintLowName(name, data->dst_file);
-
     bool is_ram_access = (args & RAM_ACCESS) != 0;
     bool is_number     = (args & NUMBER) != 0;
     bool is_string     = (args & STRING) != 0;
 
-    Elem_t arg_type = NO_ARGS;
+    Elem_t arg_type = NO_ARG_TYPE;
     if (is_number + is_string + is_ram_access > 1)
         arg_type = *((Elem_t *) data->buf + (*index)++);
 
@@ -161,7 +157,7 @@ static Result ArgsRead(DisasmData *data, const char args, const char name[], int
         else
             fprintf(data->dst_file, " %s\n" ,regs[*((Elem_t *) data->buf + (*index)++)]);
     }
-    else if (arg_type == NO_ARGS) {
+    else if (arg_type == NO_ARG_TYPE) {
         fprintf(data->dst_file, " " output_id "\n", *((Elem_t *) data->buf + (*index)++));
     }
     else {
@@ -181,13 +177,13 @@ static bool IsLabel(Vector *labels, const int index) {
     return 0;
 }
 
-static void MakeSpaces(Vector *labels, int *index, FILE *output) {
+static void MakeSpaces(Vector *labels, const int index, FILE *output) {
 
     assert(output);
 
     Elem_t label = 0;
-    if (IsLabel(labels, *index - 1)) {
-        label = *index - 1;
+    if (IsLabel(labels, index)) {
+        label = index;
     }
 
     for (size_t i = 0; i < (size_t) NUM_OF_SPACES; i++) {
@@ -216,5 +212,33 @@ static int GetDisasmdata(DisasmData *data, const char *byte_code_file, const cha
     data->len_of_prog = 0;
     data->byte_code_file = byte_code_file;
 
+    return SUCCESS;
+}
+
+static int GetLabels(const Elem_t *buf, Vector *labels, const Elem_t len_of_prog) {
+
+    assert(buf);
+    assert(labels);
+
+    #define DEF_CMD(name, code, args, ...)                                      \
+        case (code):                                                            \
+            if (args == NO_ARGS)                                                \
+                index++;                                                        \
+            else if (args == NUMBER || args == STRING || args == RAM_ACCESS)    \
+                index += 2;                                                     \
+            else                                                                \
+                index += 3;                                                     \
+            break;                                                              \
+
+    size_t index = START_OF_PROG;
+    Elem_t com_num = 0;
+    for (size_t i = 0; i < (size_t) len_of_prog; i++) {
+        com_num = *(buf + index);
+        if (CMD_JA <= *(buf + index) && *(buf + index) <= CMD_CALL)
+            PushBack(labels, *(buf + index + 1));
+        switch (com_num) {
+            #include "commands.h"
+        }
+    }
     return SUCCESS;
 }

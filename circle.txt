@@ -1,13 +1,12 @@
-        push 10000
+        call main
+        hlt
+
+:main   push 10000
         pop rax
         push 0
         pop rbx
 
-;Function <fill>
-;
-;Filling RAM with zeros
-
-:fill   push 0
+:fill   push 0          ;Filling RAM with zeroes
         pop [rbx]
         push rbx
         push 1
@@ -17,7 +16,7 @@
         push rax
         ja fill
 
-        in
+        in              ;Enter the radius of the circle: radius <= 50
         pop rdx
         call checkr
         push rdx
@@ -29,11 +28,7 @@
         push 1
         pop rbx
 
-;Function <draw>
-;
-;Fills RAM with correct values
-
-:draw   call line
+:draw   call line       ;Filling RAM with correct values
         push 1
         pop rax
         push rbx
@@ -45,13 +40,9 @@
         ja draw
 
         ramout
-        hlt
+        ret
 
-;Function <line>
-;
-;Fills part of RAM
-
-:line   call check
+:line   call check      ;Filling section of RAM
         push rax
         push 1
         add
@@ -61,11 +52,7 @@
         ja line
         ret
 
-;Function <check>
-;
-;Checks which value needs to be written to RAM
-
-:check  push rax
+:check  push rax        ;Сhecks whether the RAM cell needs to be filled
         push 50
         sub
         push rax
@@ -84,7 +71,7 @@
         jae do
         ret
 
-:do     push rax
+:do     push rax        ;Filling a memory cell
         push rbx
         push 100
         mul
@@ -94,20 +81,12 @@
         pop [rcx]
         ret
 
-;Function <checkr>
-;
-;Checks the radius value
-
-:checkr push rdx
+:checkr push rdx        ;Check if radius is correct
         push 50
         jb err
         ret
 
-;Function <err>
-;
-;Prints error message
-
-:err    push 69
+:err    push 69         ;Print error message
         outc
         push 82
         outc
@@ -115,4 +94,4 @@
         outc
         push 10
         outc
-        hlt
+        ret

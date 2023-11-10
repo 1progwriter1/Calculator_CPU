@@ -36,10 +36,11 @@ enum Commands {
 
 enum ArgType
 {
-    NO_ARGS    = 0,
-    NUMBER     = 1 << 0,
-    STRING     = 1 << 1,
-    RAM_ACCESS = 1 << 2,
+    NO_ARGS     = 0,
+    NUMBER      = 1 << 0,
+    STRING      = 1 << 1,
+    RAM_ACCESS  = 1 << 2,
+    NO_ARG_TYPE = -1,
 };
 
 struct Header {

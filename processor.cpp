@@ -118,7 +118,7 @@ int CPUVerify(CPU *processor) {
 void DumpCPU(CPU *processor, unsigned int error, int correct_reg) {
 
     if (!processor)
-        printf("NULL calcdata\n");
+        printf(RED "NULL calcdata" END_OF_COLOR "\n");
 
     if (!correct_reg) {
         printf("Register: {");
@@ -127,7 +127,7 @@ void DumpCPU(CPU *processor, unsigned int error, int correct_reg) {
         printf("\b}\n");
     }
     else {
-        printf("NULL reg\n");
+        printf(RED "NULL reg" END_OF_COLOR "\n");
     }
 
     dump(&processor->data, error);
@@ -184,7 +184,7 @@ static int DoCodeExecution(ProcData *data, Elem_t *ram) {
 
     do {
         com_num = *((Elem_t *) buf + index++);
-        switch (com_num) {
+            switch (com_num) {
             #include "commands.h"
             default: {
                 printf(RED "Incorrect command in <ExecuteProgram> " output_id "\n" END_OF_COLOR, com_num);
