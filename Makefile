@@ -2,12 +2,17 @@ CFLAGS=-D _DEBUG -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Wc++14-compat -Wm
 
 COMP=g++
 
+OBJ_DIR=outputfiles/
+OBJECTS=$(wildcard *.o)
+
 comp:
-	$(COMP) $(CFLAGS) -c func.cpp assembler.cpp disassembler.cpp processor.cpp my_vector.cpp labels.cpp asm.cpp disasm.cpp proc.cpp main.cpp
+	$(COMP) $(CFLAGS) -c func.cpp assembler.cpp disassembler.cpp processor.cpp my_vector.cpp labels.cpp asm.cpp disasm.cpp proc.cpp Stack/stack.cpp Stack/hash.cpp
+
+move:
+	mv $(OBJECTS) $(OBJ_DIR)/
 
 run:
-	$(COMP) $(CFLAGS) func.o assembler.o disassembler.o outputfiles/stack.o outputfiles/hash.o processor.o my_vector.o labels.o main.o
-	mv main.o outputfiles/main.o
+	$(COMP) $(CFLAGS) func.o assembler.o disassembler.o outputfiles/stack.o outputfiles/hash.o processor.o my_vector.o labels.o
 	mv labels.o outputfiles/labels.o
 	mv func.o outputfiles/func.o
 	mv my_vector.o outputfiles/my_vector.o

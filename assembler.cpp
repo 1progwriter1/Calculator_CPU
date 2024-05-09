@@ -187,6 +187,8 @@ static Result ReadArgs(AsmData *data, const char args, const char name_cmd[]) {
         }
         else if (fscanf(data->code_file, "[" output_id, &arg) == 1) {
             type_of_arg = RAM_ACCESS | NUMBER;
+            char c = 0;
+            fscanf(data->code_file, "%c", &c);
         }
         else if (fscanf(data->code_file, "%s", str) == 1) {
             len_of_str = strlen(str);

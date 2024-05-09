@@ -1,29 +1,8 @@
-        in
-        push rax
+                call main
+                hlt
+:main
         push 1
-        push rdx
-        call fact
-
-        pop rax
+        pop [0]
+        push [0]
         out
-        hlt
-
-:fact   pop rax
-        push 1
-        jae one
-        pop rax
-        pop rdx
-        mul
-        push rdx
-        pop rax
-        push 1
-        sub
-        push rax
-        call fact
-        ret
-
-:one    pop rdx
-        push 1
-        mul
-        push rax
         ret

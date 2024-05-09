@@ -26,7 +26,7 @@
     int correct = 0;                                                \
     do {                                                            \
         correct = 1;                                                \
-        if (scanf(output_id, &num) != 1) {                          \
+        if (scanf("%lg", &num) != 1) {                              \
             printf(RED "Incorrect input. Try again:\n " END_OF_COLOR);\
             clear();                                                \
             correct = 0;                                            \
@@ -184,6 +184,7 @@ static int DoCodeExecution(ProcData *data, Elem_t *ram) {
 
     do {
         com_num = *((Elem_t *) buf + index++);
+        fprintf(stderr, "%lld\n", com_num);
             switch (com_num) {
             #include "commands.h"
             default: {
