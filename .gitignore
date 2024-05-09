@@ -1,0 +1,6 @@
+*.bin
+*.o
+*.out
+*.mout
+.DS_Store
+.vscode

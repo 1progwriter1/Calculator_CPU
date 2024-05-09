@@ -184,7 +184,6 @@ static int DoCodeExecution(ProcData *data, Elem_t *ram) {
 
     do {
         com_num = *((Elem_t *) buf + index++);
-        fprintf(stderr, "%lld\n", com_num);
             switch (com_num) {
             #include "commands.h"
             default: {
