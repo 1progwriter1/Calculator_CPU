@@ -4,6 +4,8 @@
 
 int main(const int argc, const char *argv[]) {
 
+    printf("%s %s\n\n", __DATE__, __TIME__);
+
     assert(argv);
 
     if (argc < 2) {

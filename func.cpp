@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <time.h>
+#include <stdlib.h>
 
 int FileVerify(Header *filedata) {
 
@@ -38,7 +39,7 @@ unsigned long filelen(const char *filename) {
 
     struct stat buf = {};
     if (stat(filename, &buf) == - 1)
-        return NULL;
+        return ERROR;
 
     return (unsigned long) buf.st_size;
 }

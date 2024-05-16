@@ -2,6 +2,7 @@
 #include "my_vector.h"
 #include <assert.h>
 #include "calculator_values.h"
+#include <stdlib.h>
 
 const int INCREASE = 2;
 const int RAISE_VECTOR = 1;
@@ -53,7 +54,7 @@ int Pop(Vector *vec, Vec_t *num) {
     assert(vec);
 
     if (vec->size - 1 < 0) {
-        return NULL;
+        return ERROR;
     }
 
     *num = vec->data[--vec->size];

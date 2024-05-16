@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <string.h>
 #include "calculator_values.h"
+#include <stdlib.h>
 
 const int INCREASE = 2;
 const int START_ADDR_COL = 2;
@@ -34,7 +35,7 @@ int SetLabel(Labels *lbls, char *name, int current_address, int address) {
             return NO_MEMORY;
 
     Label *ptr = lbls->data + lbls->current++;
-    ptr->name = (char *) calloc (strlen(name), sizeof (char));
+    ptr->name = (char *) calloc (strlen(name) + 1, sizeof (char));
     memcpy (ptr->name, name, strlen (name));
     if (address != NO_ADDRESS)
         ptr->address = address;
@@ -54,11 +55,15 @@ static int ResizeLabels(Labels *lbls) {
 
     assert(lbls);
 
+    int tmp = lbls->size;
     lbls->size *= INCREASE;
 
     lbls->data = (Label *) realloc (lbls->data, sizeof (Label) * (unsigned long) lbls->size);
     if (!lbls->data)
         return NO_MEMORY;
+
+    for (size_t i = tmp; i < lbls->data->size; i++)
+        lbls->data[i].name = NULL;
 
     return SUCCESS;
 }
@@ -90,21 +95,26 @@ int LabelsCtor(Labels *lbls) {
     lbls->current = 0;
     lbls->size = START_LABELS_COL;
 
+    for (size_t i = 0; i < lbls->data->size; i++)
+        lbls->data[i].name = NULL;
+
     return SUCCESS;
 }
 
 int LabelsDtor(Labels *lbls) {
 
     assert(lbls);
+    assert(lbls->data);
 
     size_t index = 0;
-    while ((lbls->data + index)->name) {
-        free((lbls->data + index)->addresses_to_fill);
+    while (index < lbls->current && lbls->data[index].name) {
+        free(lbls->data[index].addresses_to_fill);
         (lbls->data + index)->address = -1;
         (lbls->data + index)->current = -1;
         free((lbls->data + index)->name);
         (lbls->data + index++)->size = -1;
     }
+
     free(lbls->data);
     lbls->current = -1;
     lbls->size = -1;

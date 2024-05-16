@@ -93,7 +93,7 @@ static int DoCodeCompilation(AsmData *data) {
     #define DEF_CMD(name_cmd, code, args, ...)                      \
         if (strcasecmp(#name_cmd, str) == 0) {                      \
             PushBack(&data->buf, code);                             \
-            if (args) {                                             \
+            if (args != NO_ARGS) {                                  \
                 if (ReadArgs(data, args, #name_cmd) != SUCCESS) {   \
                     error = 1;                                      \
                     break;                                          \

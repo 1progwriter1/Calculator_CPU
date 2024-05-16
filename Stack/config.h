@@ -7,6 +7,7 @@ typedef long long int Elem_t;
 
 const Elem_t POISON = -1e6;
 #define logs_file "logs.txt" // -- an example of file define
-#define PROTECT // protection activation
+//#define PROTECT // protection activation
+#undef PROTECT
 
 #endif

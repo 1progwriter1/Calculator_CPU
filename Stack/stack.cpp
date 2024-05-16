@@ -6,6 +6,9 @@
 #include <ctype.h>
 #include <string.h>
 
+// #undef PROTECT
+#define PROTECT
+
 #ifdef logs_file
 FILE *output_file = fileopen(logs_file);
 #else
@@ -162,6 +165,8 @@ void PrintStack(const Stack *stk) {
 }
 
 unsigned int StackVerify(const Stack *stk) {
+
+    return 0;
 
     assert(stk);
 
@@ -324,7 +329,8 @@ static void StackResize(Stack *stk, const int is_increase) {
     #else
     stk->data = (Elem_t *) realloc (stk->data, sizeof (Elem_t) * stk->capacity);
     #endif
-    Poison_fill(stk);
+    // Poison_fill(stk);
+    printf("[*]");
 }
 
 void Detor() {

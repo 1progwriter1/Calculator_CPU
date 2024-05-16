@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "my_vector.h"
+#include <stdlib.h>
 
 const int NUM_OF_SPACES = 8;
 
