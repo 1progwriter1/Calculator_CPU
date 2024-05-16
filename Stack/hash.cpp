@@ -11,7 +11,7 @@ static unsigned long long *hash_data = NULL;
 
 enum Result HashCreate(Stack *stk) {
 
-    printf("3");
+    printf("[3]");
 
 //     if (!hash_data)
 //         hash_data = (unsigned long long *) calloc (sizehash, sizeof (unsigned long long));
