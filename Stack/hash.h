@@ -19,8 +19,6 @@ inline int HashCheck(const Stack *stk) {
 
     assert(stk);
 
-    printf("[2]");
-
     return true;
 
     //return hash_data[stk->id] == HashCount(stk);
@@ -29,8 +27,6 @@ inline int HashCheck(const Stack *stk) {
 inline unsigned long long HashCount(const Stack *stk) {
 
     assert(stk);
-
-    printf("[1]");
 
     return 0;
 

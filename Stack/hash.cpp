@@ -4,14 +4,12 @@
 #include <stdlib.h>
 
 //#undef PROTECT
-#define PROTECT
+//#define PROTECT
 
 unsigned long sizehash = 8;
 static unsigned long long *hash_data = NULL;
 
 enum Result HashCreate(Stack *stk) {
-
-    printf("[3]");
 
 //     if (!hash_data)
 //         hash_data = (unsigned long long *) calloc (sizehash, sizeof (unsigned long long));

@@ -9,10 +9,12 @@
 #include "calculator_values.h"
 #include <string.h>
 
-#define VERIFY                          \
-    if (!CPUVerify(data->processor)) {  \
-        return ERROR;                   \
-    }                                   \
+// #define VERIFY                          \
+//     if (!CPUVerify(data->processor)) {  \
+//         return ERROR;                   \
+//     }                                   \
+
+#define VERIFY ;
 
 #define PUSH_NUM(num) StackPush(&data->processor->data, num)
 
@@ -175,6 +177,7 @@ static int DoCodeExecution(ProcData *data, Elem_t *ram) {
     char *buf = data->buf;
     Elem_t com_num = 0;
     int index = START_OF_PROG;
+    int cur = 0;
 
     #define DEF_CMD(name, code, args, ...)      \
         case (code): {                          \
@@ -184,7 +187,6 @@ static int DoCodeExecution(ProcData *data, Elem_t *ram) {
 
     do {
         com_num = *((Elem_t *) buf + index++);
-        fprintf(stderr, "%lld\n", com_num);
             switch (com_num) {
             #include "commands.h"
             default: {

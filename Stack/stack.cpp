@@ -7,7 +7,7 @@
 #include <string.h>
 
 // #undef PROTECT
-#define PROTECT
+//#define PROTECT
 
 #ifdef logs_file
 FILE *output_file = fileopen(logs_file);
@@ -15,7 +15,7 @@ FILE *output_file = fileopen(logs_file);
 FILE *output_file = stdout;
 #endif
 
-const int SIZESTK = 8;
+const int SIZESTK = 32;
 const int INCREASE = 2;
 const int EMPTY_POSITIONS = 3;
 const int NUM_OF_ERRORS = 12;
@@ -330,7 +330,6 @@ static void StackResize(Stack *stk, const int is_increase) {
     stk->data = (Elem_t *) realloc (stk->data, sizeof (Elem_t) * stk->capacity);
     #endif
     // Poison_fill(stk);
-    printf("[*]");
 }
 
 void Detor() {
