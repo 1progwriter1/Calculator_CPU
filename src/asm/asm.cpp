@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "assembler.h"
-#include "calculator_values.h"
+#include "../lib/calculator_values.h"
 
 int main(const int argc, const char *argv[]) {
 

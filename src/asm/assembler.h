@@ -2,9 +2,9 @@
 #define TRANSLATOR_CALCULATOR
 
 #include <stdio.h>
-#include "Stack/stack_values.h"
-#include "labels.h"
-#include "my_vector.h"
+#include "../stack/stack_values.h"
+#include "../labels/labels.h"
+#include "../vector/my_vector.h"
 
 #define byte_code "byte_code.bin"
 
@@ -15,6 +15,6 @@ struct AsmData {
     FILE *byte_code_file;
 };
 
-enum Result CodeCompile(const char *file, const char *outfile);
+int CodeCompile(const char *file, const char *outfile);
 
 #endif

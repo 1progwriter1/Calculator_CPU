@@ -11,41 +11,10 @@
  *
  * @return value of hash
  */
-enum Result HashCreate(Stack *stk);
+unsigned long long HashCount(const Stack *stk);
+int HashCreate(Stack *stk);
 void clean();
-void HashClean(int id);
-
-inline int HashCheck(const Stack *stk) {
-
-    assert(stk);
-
-    return true;
-
-    //return hash_data[stk->id] == HashCount(stk);
-}
-
-inline unsigned long long HashCount(const Stack *stk) {
-
-    assert(stk);
-
-    return 0;
-
-//     unsigned long long bytesum = 5381;
-//     unsigned long NUM_OF_BITES = stk->capacity * sizeof (Elem_t) + 2 * sizeof (canary_t);
-//     char *ptr = (char *) stk->data - sizeof (canary_t);
-//
-//     for (size_t i = 0; i < NUM_OF_BITES; i++) {
-//         bytesum = 33 * bytesum + (unsigned long) *ptr++;
-//     }
-//     Stack *stk_ptr = const_cast<Stack *>(stk);
-//     ptr = (char *) stk_ptr + sizeof (canary_t);
-//     NUM_OF_BITES = sizeof (Elem_t *) + sizeof (int);
-//
-//     for (size_t i = 0; i < NUM_OF_BITES; i++) {
-//         bytesum = 33 * bytesum + (unsigned long long) *ptr++;
-//     }
-//
-//     return bytesum;
-}
+void HashClean(size_t id);
+int HashCheck(const Stack *stk);
 
 #endif

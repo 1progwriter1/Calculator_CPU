@@ -2,7 +2,7 @@
 #include "labels.h"
 #include <assert.h>
 #include <string.h>
-#include "calculator_values.h"
+#include "../lib/calculator_values.h"
 #include <stdlib.h>
 
 const int INCREASE = 2;
@@ -62,7 +62,7 @@ static int ResizeLabels(Labels *lbls) {
     if (!lbls->data)
         return NO_MEMORY;
 
-    for (size_t i = tmp; i < lbls->data->size; i++)
+    for (int i = tmp; i < lbls->data->size; i++)
         lbls->data[i].name = NULL;
 
     return SUCCESS;
@@ -95,7 +95,7 @@ int LabelsCtor(Labels *lbls) {
     lbls->current = 0;
     lbls->size = START_LABELS_COL;
 
-    for (size_t i = 0; i < lbls->data->size; i++)
+    for (int i = 0; i < lbls->data->size; i++)
         lbls->data[i].name = NULL;
 
     return SUCCESS;
@@ -106,7 +106,7 @@ int LabelsDtor(Labels *lbls) {
     assert(lbls);
     assert(lbls->data);
 
-    size_t index = 0;
+    int index = 0;
     while (index < lbls->current && lbls->data[index].name) {
         free(lbls->data[index].addresses_to_fill);
         (lbls->data + index)->address = -1;

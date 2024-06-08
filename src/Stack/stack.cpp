@@ -5,21 +5,18 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-
-// #undef PROTECT
-//#define PROTECT
+#include "../lib/func.h"
 
 #ifdef logs_file
-FILE *output_file = fileopen(logs_file);
+FILE *output_file = fileopen(logs_file, "w");
 #else
 FILE *output_file = stdout;
 #endif
-
-const int SIZESTK = 32;
+const int SIZESTK = 8;
 const int INCREASE = 2;
 const int EMPTY_POSITIONS = 3;
 const int NUM_OF_ERRORS = 12;
-static int Current_id = 0;
+static size_t Current_id = 0;
 const Elem_t *POISON_PTR = &POISON;
 const canary_t CANARY_VALUE_STACK_LEFT = 0xBADBA5EBA11;
 const canary_t CANARY_VALUE_STACK_RIGHT = 0xAB0BA;
@@ -27,14 +24,13 @@ const canary_t CANARY_VALUE_DATA_LEFT = 0xC01055A1;
 const canary_t CANARY_VALUE_DATA_RIGHT = 0xBADFACE;
 
 static void PrintInfo(const Stack *stk, const char *file, const char *func, const int line);
-static const char* StackStrError (enum Result error);
+static const char* StackStrError (int error);
 static void InfoDetor(StackInfo *info);
 static void StackResize(Stack *stk, const int is_increase);
 static void Poison_fill(Stack *stk);
 static void SetCanary(Stack *stk);
 
-
-enum Result StackCtor(Stack *stk, const char *name, const char *file, const int line, const char *func) {
+int StackCtor(Stack *stk, const char *name, const char *file, const int line, const char *func) {
 
     assert(stk);
     assert(name);
@@ -69,7 +65,7 @@ enum Result StackCtor(Stack *stk, const char *name, const char *file, const int 
     return SUCCESS;
 }
 
-enum Result StackPush(Stack *stk, Elem_t n) {
+int StackPush(Stack *stk, Elem_t n) {
 
     assert(stk);
 
@@ -90,7 +86,7 @@ enum Result StackPush(Stack *stk, Elem_t n) {
     return SUCCESS;
 }
 
-enum Result StackPop(Stack *stk, Elem_t *n) {
+int StackPop(Stack *stk, Elem_t *n) {
 
     assert(stk);
     assert(n);
@@ -102,7 +98,7 @@ enum Result StackPop(Stack *stk, Elem_t *n) {
     }
     if (stk->size >= 1) {
         *n = stk->data[--stk->size];
-        stk->data[stk->size] = POISON;
+        stk->data[stk->size + 1] = POISON;
         if (stk->capacity > SIZESTK && stk->capacity - stk->size > stk->capacity - stk->capacity / 2) {
             StackResize(stk, CUT);
             if (!stk->data)
@@ -116,7 +112,7 @@ enum Result StackPop(Stack *stk, Elem_t *n) {
     return EMPTY;
 }
 
-enum Result StackDtor(Stack *stk) {
+int StackDtor(Stack *stk) {
 
     assert(stk);
 
@@ -166,19 +162,16 @@ void PrintStack(const Stack *stk) {
 
 unsigned int StackVerify(const Stack *stk) {
 
-    return 0;
-
     assert(stk);
 
     unsigned int error = 0;
 
-    unsigned int numerror = 1;
+    unsigned int numerror = 2;
 
     if (stk == NULL) {
         error |= numerror;
         return error;
     }
-
     numerror *= 2;
     if (stk->data == NULL)
         error |= numerror;
@@ -230,7 +223,7 @@ unsigned int StackVerify(const Stack *stk) {
     return error;
 }
 
-static const char* StackStrError (enum Result error) {
+static const char* StackStrError (int error) {
 
     #define ERR_(code)  case code: return #code;
 
@@ -241,7 +234,7 @@ static const char* StackStrError (enum Result error) {
         ERR_ (NO_MEMORY)
         ERR_ (INCORRECT_CAPACITY)
         ERR_ (INCORRECT_SIZE)
-        ERR_ (OVERFLOW)
+        ERR_ (STACK_OVERFLOW)
         ERR_ (CANARY_FAULT_STACK_LEFT)
         ERR_ (CANARY_FAULT_STACK_RIGHT)
         ERR_ (CANARY_FAULT_DATA_LEFT)
@@ -271,7 +264,7 @@ void StackDump(unsigned int error, const char *file, const int line, const char 
             const int NUMBER = 1;
 
             int err = 0;
-            for (int i = 0; i < NUM_OF_ERRORS; i++) {
+            for (int i = 2; i < NUM_OF_ERRORS + 1; i++) {
                 if ((error | NUMBER) == error) {
                     fprintf(output_file, "%s%d (%s)", (err? ", " : ""), i, StackStrError ((enum Result) i));
                     err = 1;
@@ -329,32 +322,11 @@ static void StackResize(Stack *stk, const int is_increase) {
     #else
     stk->data = (Elem_t *) realloc (stk->data, sizeof (Elem_t) * stk->capacity);
     #endif
-    // Poison_fill(stk);
+    Poison_fill(stk);
 }
 
 void Detor() {
     clean();
-}
-
-void fileclose(FILE *fn) {
-
-    assert(fn);
-
-    if (fn != stdout)
-        if (fclose(fn) != 0)
-            fprintf(stderr, "File not closed\n");
-}
-
-FILE *fileopen(const char *filename) {
-
-    assert(filename);
-
-    FILE *fn = fopen(filename, "w");
-
-    if (fn == NULL)
-        perror("");
-
-    return fn;
 }
 
 static void Poison_fill(Stack *stk) {
@@ -368,8 +340,8 @@ static void Poison_fill(Stack *stk) {
 static void SetCanary(Stack *stk) {
 
     assert(stk);
-    unsigned long length = sizeof (Elem_t) * SIZESTK + sizeof (canary_t) * 2;
-    stk->data = (Elem_t *) calloc (length, sizeof (char));
+    int length = sizeof (Elem_t) * SIZESTK + sizeof (canary_t) * 2;
+    stk->data = (Elem_t *) calloc ((size_t) length, sizeof (char));
 
     if (stk->data) {
         ((canary_t *) stk->data)[0] = CANARY_VALUE_DATA_LEFT;

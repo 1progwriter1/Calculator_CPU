@@ -1,7 +1,7 @@
 #ifndef CALC_VALUES
 #define CALC_VALUES
 
-#include "Stack/stack_values.h"
+#include "../stack/stack_values.h"
 
 #define READ "r"
 #define WRITE "w"

@@ -61,3 +61,12 @@ int DayNumber() {
 
     return current_time->tm_yday % 7;
 }
+
+void fileclose(FILE *fn) {
+
+    assert(fn);
+
+    if (fn != stdout)
+        if (fclose(fn) != 0)
+            fprintf(stderr, "File not closed\n");
+}

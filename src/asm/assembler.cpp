@@ -1,17 +1,16 @@
 #include <stdio.h>
 #include "assembler.h"
-#include "calculator_values.h"
+#include "../lib/calculator_values.h"
 #include <assert.h>
-#include "func.h"
-#include "my_vector.h"
+#include "../lib/func.h"
 #include <string.h>
-#include "Stack/stack.h"
+#include "../stack/stack.h"
 #include "ctype.h"
-#include "labels.h"
+#include "../labels/labels.h"
 
 const int VEC_SIZE = 8;
 
-static Result ReadArgs(AsmData *data, const char args, const char name_cmd[]);
+static int ReadArgs(AsmData *data, const char args, const char name_cmd[]);
 static int PrepareForCompilation(AsmData *data);
 static int FillLabels(Vector *buf, Labels *lbls);
 static int EndCompilation(AsmData *data);
@@ -20,7 +19,7 @@ static int RegIndex(char *namereg, const size_t len_of_str);
 static void SkipLine(FILE *fn);
 static int GetAsmData(AsmData *data, const char *input_file, const char *output_file);
 
-enum Result CodeCompile(const char *input_file, const char *output_file) {
+int CodeCompile(const char *input_file, const char *output_file) {
 
     assert(input_file);
     assert(output_file);
@@ -60,13 +59,13 @@ static int PrepareForCompilation(AsmData *data) {
     if (!data->code_file) {
         LabelsDtor(&data->lbls);
         fileclose(data->byte_code_file);
-        return FILEOPEN_ERROR;
+        return FILE_OPEN_ERROR;
     }
 
     if (!data->byte_code_file) {
         LabelsDtor(&data->lbls);
         fileclose(data->code_file);
-        return FILEOPEN_ERROR;
+        return FILE_OPEN_ERROR;
     }
 
     if (VectorCtor(&data->buf, VEC_SIZE) != SUCCESS) {
@@ -113,7 +112,7 @@ static int DoCodeCompilation(AsmData *data) {
             continue;
         }
 
-        #include "commands.h"
+        #include "../lib/commands.h"
 
         printf(RED "Incorrect command in <CodeCompile>: %s" END_OF_COLOR "\n", str);
         error = 1;
@@ -164,7 +163,7 @@ static int RegIndex(char *namereg, const size_t len_of_str) {
     return -1;
 }
 
-static Result ReadArgs(AsmData *data, const char args, const char name_cmd[]) {
+static int ReadArgs(AsmData *data, const char args, const char name_cmd[]) {
 
     assert(data);
     assert(data->code_file);

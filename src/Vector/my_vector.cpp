@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "my_vector.h"
 #include <assert.h>
-#include "calculator_values.h"
+#include "../lib/calculator_values.h"
 #include <stdlib.h>
 
 const int INCREASE = 2;
