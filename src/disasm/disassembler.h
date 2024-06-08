@@ -2,8 +2,8 @@
 #define DISASS_CALC
 
 #include <stdio.h>
-#include "Stack/stack_values.h"
-#include "my_vector.h"
+#include "../stack/stack_values.h"
+#include "../vector/my_vector.h"
 
 #define disasm_file "dis_file.txt"
 
@@ -16,6 +16,6 @@ struct DisasmData {
     const char *byte_code_file;
 };
 
-enum Result CodeTranslate(const char *file, const char *dis_file);
+int CodeTranslate(const char *file, const char *dis_file);
 
 #endif

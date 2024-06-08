@@ -1,20 +1,18 @@
 #include <stdio.h>
-#include "Stack/stack.h"
-#include "Stack/stack_values.h"
+#include "../stack/stack.h"
+#include "../stack/stack_values.h"
 #include <assert.h>
 #include "processor.h"
 #include <math.h>
-#include "func.h"
-#include "Stack/config.h"
-#include "calculator_values.h"
+#include "../lib/func.h"
+#include "../stack/config.h"
+#include "../lib/calculator_values.h"
 #include <string.h>
 
-// #define VERIFY                          \
-//     if (!CPUVerify(data->processor)) {  \
-//         return ERROR;                   \
-//     }                                   \
-
-#define VERIFY ;
+#define VERIFY                          \
+    if (!CPUVerify(data->processor)) {  \
+        return ERROR;                   \
+    }                                   \
 
 #define PUSH_NUM(num) StackPush(&data->processor->data, num)
 
@@ -50,7 +48,7 @@ static int CPUVerify(CPU *calcdata);
 static void DumpCPU(CPU *calcdata, unsigned int error, int correct_reg);
 static int GetProcData(ProcData *data, const char *byte_code_file, CPU *processor);
 
-enum Result ExecuteProgram(CPU *processor, const char *byte_code_file) {
+int ExecuteProgram(CPU *processor, const char *byte_code_file) {
 
     assert(processor);
     assert(byte_code_file);
@@ -74,7 +72,7 @@ enum Result ExecuteProgram(CPU *processor, const char *byte_code_file) {
     return SUCCESS;
 }
 
-enum Result CPUCtor(CPU *processor) {
+int CPUCtor(CPU *processor) {
 
     if (!processor)
         return NULL_POINTER;
@@ -89,7 +87,7 @@ enum Result CPUCtor(CPU *processor) {
     return SUCCESS;
 }
 
-enum Result CPUDtor(CPU *processor) {
+int CPUDtor(CPU *processor) {
 
     if (!processor)
         return NULL_POINTER;
@@ -177,7 +175,6 @@ static int DoCodeExecution(ProcData *data, Elem_t *ram) {
     char *buf = data->buf;
     Elem_t com_num = 0;
     int index = START_OF_PROG;
-    int cur = 0;
 
     #define DEF_CMD(name, code, args, ...)      \
         case (code): {                          \
@@ -188,7 +185,7 @@ static int DoCodeExecution(ProcData *data, Elem_t *ram) {
     do {
         com_num = *((Elem_t *) buf + index++);
             switch (com_num) {
-            #include "commands.h"
+            #include "../lib/commands.h"
             default: {
                 printf(RED "Incorrect command in <ExecuteProgram> " output_id "\n" END_OF_COLOR, com_num);
                 return ERROR;

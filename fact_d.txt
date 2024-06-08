@@ -1,0 +1,24 @@
+        call 6
+        hlt
+:6      in
+        pop rax
+        call 17
+        push rbx
+        out
+        ret
+:17     push rax
+        push 1
+        jae 48
+        push rax
+        push rax
+        push 1
+        sub
+        pop rax
+        call 17
+        push rbx
+        mul
+        pop rbx
+        ret
+:48     push 1
+        pop rbx
+        ret

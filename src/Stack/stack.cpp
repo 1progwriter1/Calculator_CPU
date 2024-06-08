@@ -288,7 +288,7 @@ static void PrintInfo(const Stack *stk, const char *file, const char *func, cons
     assert(func);
 
     int col = 0;
-    fprintf(output_file, "Stack \"%s\" [%p] from \"%s\" (%d)\ncalled from \"%s\" (%d)\n", stk->info.name, stk, stk->info.file, stk->info.line, file, line);
+    fprintf(output_file, "Stack \"%s\" [%p] from \"%s\" (%d)\ncalled from file: \"%s\", function: \"%s\", line: (%d)\n", stk->info.name, stk, stk->info.file, stk->info.line, file, func, line);
         fprintf(output_file, "{size = %lu\n capacity = %lu\n data [%p]\n", stk->size, stk->capacity, stk->data);
 
     if (stk->capacity > 0 && stk->data) {

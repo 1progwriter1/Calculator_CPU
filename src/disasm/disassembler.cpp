@@ -1,17 +1,17 @@
 #include <stdio.h>
-#include "func.h"
+#include "../lib/func.h"
 #include <assert.h>
-#include "calculator_values.h"
+#include "../lib/calculator_values.h"
 #include "disassembler.h"
-#include "Stack/stack.h"
+#include "../stack/stack.h"
 #include <ctype.h>
 #include <string.h>
-#include "my_vector.h"
+#include "../vector/my_vector.h"
 #include <stdlib.h>
 
 const int NUM_OF_SPACES = 8;
 
-static Result ArgsRead(DisasmData *data, const char args, const char name[], int *index);
+static int ArgsRead(DisasmData *data, const char args, const char name[], int *index);
 static void PrintLowName(const char name[], FILE *out);
 static bool IsLabel(Vector *labels, const int index);
 static void MakeSpaces(Vector *labels, const int index, FILE *output);
@@ -20,7 +20,7 @@ static int DoCodeTranslation(DisasmData *data);
 static int GetDisasmdata(DisasmData *data, const char *byte_code_file, const char *dis_file);
 static int GetLabels(const Elem_t *buf, Vector *labels, const Elem_t len_of_prog);
 
-enum Result CodeTranslate(const char *byte_code_file, const char *dis_file) {
+int CodeTranslate(const char *byte_code_file, const char *dis_file) {
 
     assert(byte_code_file);
     assert(dis_file);
@@ -55,14 +55,14 @@ static int PrepareForTranslation(DisasmData *data) {
 
     if (!data->dst_file) {
         free(data->buf);
-        return FILEOPEN_ERROR;
+        return FILE_OPEN_ERROR;
     }
 
     FILE *input_file = fileopen(data->byte_code_file, READ);
     if (!data->dst_file) {
         free(data->buf);
         fileclose(data->dst_file);
-        return FILEOPEN_ERROR;
+        return FILE_OPEN_ERROR;
     }
 
     fread(data->buf, sizeof (char), data->len_of_file + 1, input_file);
@@ -105,7 +105,7 @@ static int DoCodeTranslation(DisasmData *data) {
     do {
         com_num = *((Elem_t *) data->buf + index++);
         switch (com_num) {
-            #include "commands.h"
+            #include "../lib/commands.h"
             default: {
                 printf(RED "Incorrect command number in <CodeTranslate>\n" END_OF_COLOR);
                 error = 1;
@@ -130,7 +130,7 @@ static void PrintLowName(const char name[], FILE *output_file) {
     }
 }
 
-static Result ArgsRead(DisasmData *data, const char args, const char name[], int *index) {
+static int ArgsRead(DisasmData *data, const char args, const char name[], int *index) {
 
     assert(data);
     assert(data->dst_file);
@@ -238,7 +238,7 @@ static int GetLabels(const Elem_t *buf, Vector *labels, const Elem_t len_of_prog
         if (CMD_JA <= *(buf + index) && *(buf + index) <= CMD_CALL)
             PushBack(labels, *(buf + index + 1));
         switch (com_num) {
-            #include "commands.h"
+            #include "../lib/commands.h"
         }
     }
     return SUCCESS;
