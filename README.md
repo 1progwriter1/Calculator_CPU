@@ -25,6 +25,7 @@
     - `mul` - arg1 * arg2.
     - `div` - arg1 / arg2.
     - `sqrt` - $\sqrt{arg1}$.
+    - `sqrt` - $sqrt {arg1}$.
     - `sin` - sin(arg1).
     - `cos` - cos(arg1).
     - `pow` - $arg1^{arg2}.$
