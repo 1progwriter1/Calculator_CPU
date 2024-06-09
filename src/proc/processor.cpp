@@ -5,7 +5,7 @@
 #include "processor.h"
 #include <math.h>
 #include "../lib/func.h"
-#include "../stack/config.h"
+#include "../configuration.h"
 #include "../lib/calculator_values.h"
 #include <string.h>
 
@@ -35,11 +35,8 @@
 
 #define GET_ELEM(operation) ((Elem_t *) data->buf + index operation)
 
-static const int PRECISION = 3;
 static const int MUL_PRES = (int) pow(10, PRECISION);
 const double PI = 3.14159265;
-const int RAM_SIZE = 10000;
-
 
 static void clear();
 static int PrepareForExecution(ProcData *data);

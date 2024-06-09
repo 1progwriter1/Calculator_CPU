@@ -1,13 +1,15 @@
 #ifndef VALUES_STACK
 #define VALUES_STACK
 
-#include "config.h"
+#include "../configuration.h"
 #include "../../../MyLibraries/headers/systemdata.h"
 
 #define info(stk) PrintInfo(&stk, (char *)__FILE__, (char *)__func__, __LINE__);
 #define STACK_CTOR(stk) StackCtor(&stk, #stk, (const char *)__FILE__, __LINE__, (const char *)__func__);
 
 typedef unsigned long long canary_t;
+
+const Elem_t POISON = 1e6;
 
 const int RAISE = 1;
 const int CUT = 0;
